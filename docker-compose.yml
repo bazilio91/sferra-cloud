@@ -13,18 +13,6 @@ services:
     volumes:
       - db_data:/var/lib/postgresql/data
 
-  rabbitmq:
-    image: rabbitmq:3-management
-    restart: always
-    ports:
-      - "127.0.0.1:5672:5672"
-      - "127.0.0.1:15672:15672"
-    environment:
-      RABBITMQ_DEFAULT_USER: sferra
-      RABBITMQ_DEFAULT_PASS: sferra_password
-    volumes:
-      - rabbitmq_data:/var/lib/rabbitmq
-
   minio:
     image: minio/minio:latest
     restart: always

@@ -6,7 +6,9 @@ services:
       context: .
       dockerfile: Dockerfile
     ports:
-      - "127.0.0.1:8080:8080"
+      - "127.0.0.1:${API_SERVER_PORT:-8080}:${API_SERVER_PORT:-8080}"
+      - "127.0.0.1:${GRPC_SERVER_PORT:-50051}:${GRPC_SERVER_PORT:-50051}"
+      - "127.0.0.1:${ADMIN_SERVER_PORT:-8081}:${ADMIN_SERVER_PORT:-8081}"
     environment:
       - DB_HOST=db
       - DB_PORT=5432
@@ -17,9 +19,13 @@ services:
       - RABBITMQ_PORT=5672
       - RABBITMQ_USER=sferra
       - RABBITMQ_PASSWORD=sferra_password
-    depends_on:
-      - db
-      - rabbitmq
+      - API_SERVER_PORT=${API_SERVER_PORT:-8080}
+      - GRPC_SERVER_PORT=${GRPC_SERVER_PORT:-50051}
+      - ADMIN_SERVER_PORT=${ADMIN_SERVER_PORT:-8081}
+      - JWT_SECRET=${JWT_SECRET:-your_jwt_secret_key}
+      - SENTRY_DSN=${SENTRY_DSN}
+      - SENTRY_ENV=${SENTRY_ENV:-production}
+      - GIN_MODE=${GIN_MODE:-release}
     networks:
       - sferra-network
 

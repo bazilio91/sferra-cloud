@@ -4,7 +4,7 @@
   "description": "Cloud layer for calculating the cost of manufacturing parts.",
   "main": "index.js",
   "scripts": {
-    "build:css": "npx tailwindcss -i ./src/css/styles.css -o ./static/css/styles.css --watch"
+    "build:css": "npx tailwindcss -i ./src/css/styles.css -o ./static/css/styles.css"
   },
   "keywords": [],
   "author": "",
