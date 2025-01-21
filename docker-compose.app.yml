@@ -17,9 +17,6 @@ services:
       - RABBITMQ_PORT=5672
       - RABBITMQ_USER=sferra
       - RABBITMQ_PASSWORD=sferra_password
-    depends_on:
-      - db
-      - rabbitmq
     networks:
       - sferra-network
 
