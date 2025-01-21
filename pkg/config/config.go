@@ -4,6 +4,7 @@ package config
 import (
 	"github.com/joho/godotenv"
 	"github.com/pkg/errors"
+	"fmt"
 	"os"
 	"strconv"
 )
@@ -28,6 +29,7 @@ type Config struct {
 
 	// Sentry Configuration
 	SentryDSN string
+	SentryEnv string
 }
 
 func LoadConfig() (*Config, error) {
@@ -53,7 +55,10 @@ func LoadConfig() (*Config, error) {
 		S3Bucket:          os.Getenv("S3_BUCKET"),
 		S3AccessKeyID:     os.Getenv("S3_ACCESS_KEY_ID"),
 		S3SecretAccessKey: os.Getenv("S3_SECRET_ACCESS_KEY"),
-		SentryDSN:         os.Getenv("SENTRY_DSN"),
+
+		// Sentry Configuration
+		SentryDSN: os.Getenv("SENTRY_DSN"),
+		SentryEnv: os.Getenv("SENTRY_ENV"),
 	}
 
 	// Validate configuration
@@ -116,8 +121,11 @@ func (cfg *Config) validate() error {
 	if cfg.S3SecretAccessKey == "" {
 		return errors.New("S3_SECRET_ACCESS_KEY is not set")
 	}
-	if cfg.SentryDSN == "" {
-		return errors.New("SENTRY_DSN is not set")
+	if cfg.SentryDSN == "" && cfg.SentryEnv != "dev" {
+		return fmt.Errorf("SENTRY_DSN is required for environment: %s", cfg.SentryEnv)
+	}
+	if cfg.SentryEnv == "" {
+		cfg.SentryEnv = "production"
 	}
 	return nil
 }
