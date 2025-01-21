@@ -25,6 +25,7 @@ services:
       - JWT_SECRET=${JWT_SECRET:-your_jwt_secret_key}
       - SENTRY_DSN=${SENTRY_DSN}
       - SENTRY_ENV=${SENTRY_ENV:-production}
+      - GIN_MODE=${GIN_MODE:-release}
     networks:
       - sferra-network
 
