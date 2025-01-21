@@ -15,44 +15,44 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
-        "/account": {
+        "/api/v1/account": {
             "get": {
                 "security": [
                     {
                         "BearerAuth": []
                     }
                 ],
-                "description": "Get information about the current user",
+                "description": "GetTaskImage information about the current user",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
                     "account"
                 ],
-                "summary": "Get Account Info",
+                "summary": "GetTaskImage Account Info",
                 "responses": {
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/handlers.AccountInfoResponse"
+                            "$ref": "#/definitions/pkg_api_handlers.AccountInfoResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/handlers.ErrorResponse"
+                            "$ref": "#/definitions/pkg_api_handlers.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/handlers.ErrorResponse"
+                            "$ref": "#/definitions/pkg_api_handlers.ErrorResponse"
                         }
                     }
                 }
             }
         },
-        "/auth/login": {
+        "/api/v1/auth/login": {
             "post": {
                 "description": "Authenticate user and return JWT token",
                 "consumes": [
@@ -72,7 +72,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/handlers.LoginInput"
+                            "$ref": "#/definitions/pkg_api_handlers.LoginInput"
                         }
                     }
                 ],
@@ -80,25 +80,25 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/handlers.TokenResponse"
+                            "$ref": "#/definitions/pkg_api_handlers.TokenResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/handlers.ErrorResponse"
+                            "$ref": "#/definitions/pkg_api_handlers.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/handlers.ErrorResponse"
+                            "$ref": "#/definitions/pkg_api_handlers.ErrorResponse"
                         }
                     }
                 }
             }
         },
-        "/auth/register": {
+        "/api/v1/auth/register": {
             "post": {
                 "description": "Register a new user",
                 "consumes": [
@@ -118,7 +118,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/handlers.RegisterInput"
+                            "$ref": "#/definitions/pkg_api_handlers.RegisterInput"
                         }
                     }
                 ],
@@ -126,19 +126,358 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/handlers.SuccessResponse"
+                            "$ref": "#/definitions/pkg_api_handlers.SuccessResponse"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/handlers.ErrorResponse"
+                            "$ref": "#/definitions/pkg_api_handlers.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/handlers.ErrorResponse"
+                            "$ref": "#/definitions/pkg_api_handlers.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/recognition_tasks": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "List DataRecognitionTasks for the authenticated client",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "recognition_tasks"
+                ],
+                "summary": "List DataRecognitionTask",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Filter by status",
+                        "name": "status",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Page number",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Page size",
+                        "name": "page_size",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/pkg_api_handlers.DataRecognitionTaskListResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/pkg_api_handlers.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/pkg_api_handlers.ErrorResponse"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Create a new DataRecognitionTask",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "recognition_tasks"
+                ],
+                "summary": "Create DataRecognitionTask",
+                "parameters": [
+                    {
+                        "description": "DataRecognitionTask data",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/github_com_bazilio91_sferra-cloud_pkg_proto.DataRecognitionTask"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_bazilio91_sferra-cloud_pkg_proto.DataRecognitionTask"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/pkg_api_handlers.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/pkg_api_handlers.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/recognition_tasks/{id}": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "GetTaskImage a DataRecognitionTask by ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "recognition_tasks"
+                ],
+                "summary": "GetTaskImage DataRecognitionTask",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "DataRecognitionTask ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_bazilio91_sferra-cloud_pkg_proto.DataRecognitionTask"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/pkg_api_handlers.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/pkg_api_handlers.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/pkg_api_handlers.ErrorResponse"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Update a UpdateDataRecognitionTask by ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "recognition_tasks"
+                ],
+                "summary": "Update UpdateDataRecognitionTask",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "UpdateDataRecognitionTask ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Updated DataRecognitionTask",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/github_com_bazilio91_sferra-cloud_pkg_proto.DataRecognitionTask"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_bazilio91_sferra-cloud_pkg_proto.DataRecognitionTask"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/pkg_api_handlers.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/pkg_api_handlers.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/pkg_api_handlers.ErrorResponse"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Delete a DataRecognitionTask by ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "recognition_tasks"
+                ],
+                "summary": "Delete DataRecognitionTask",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "DataRecognitionTask ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/pkg_api_handlers.SuccessResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/pkg_api_handlers.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/pkg_api_handlers.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/pkg_api_handlers.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/images/upload": {
+            "post": {
+                "description": "UploadTaskImage an image to storage",
+                "consumes": [
+                    "multipart/form-data"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "UploadTaskImage an image",
+                "parameters": [
+                    {
+                        "type": "file",
+                        "description": "Image file",
+                        "name": "image",
+                        "in": "formData",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/images/{id}": {
+            "get": {
+                "description": "GetTaskImage an image by ID",
+                "produces": [
+                    "image/jpeg",
+                    "image/png",
+                    "image/gif"
+                ],
+                "summary": "GetTaskImage an image",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Image ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "file"
                         }
                     }
                 }
@@ -146,15 +485,338 @@ const docTemplate = `{
         }
     },
     "definitions": {
-        "handlers.AccountInfoResponse": {
+        "github_com_bazilio91_sferra-cloud_pkg_proto.Assortment": {
             "type": "object",
             "properties": {
-                "email": {
+                "chemical_composition": {
+                    "type": "string"
+                },
+                "chemical_gost": {
+                    "type": "string"
+                },
+                "field_status": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "$ref": "#/definitions/github_com_bazilio91_sferra-cloud_pkg_proto.FieldStatus"
+                    }
+                },
+                "figure_type": {
+                    "type": "string"
+                },
+                "form_gost": {
+                    "type": "string"
+                },
+                "material": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "size": {
+                    "type": "string"
+                },
+                "sub_type": {
                     "type": "string"
                 }
             }
         },
-        "handlers.ErrorResponse": {
+        "github_com_bazilio91_sferra-cloud_pkg_proto.Client": {
+            "type": "object",
+            "properties": {
+                "created_at": {
+                    "type": "integer"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "inn": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "ogrn": {
+                    "type": "integer"
+                },
+                "owner_fio": {
+                    "type": "string"
+                },
+                "quota": {
+                    "type": "integer"
+                },
+                "updated_at": {
+                    "type": "integer"
+                }
+            }
+        },
+        "github_com_bazilio91_sferra-cloud_pkg_proto.ClientUser": {
+            "type": "object",
+            "properties": {
+                "Password": {
+                    "type": "string"
+                },
+                "Username": {
+                    "type": "string"
+                },
+                "client": {
+                    "$ref": "#/definitions/github_com_bazilio91_sferra-cloud_pkg_proto.Client"
+                },
+                "client_id": {
+                    "type": "integer"
+                },
+                "created_at": {
+                    "type": "integer"
+                },
+                "email": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "updated_at": {
+                    "type": "integer"
+                }
+            }
+        },
+        "github_com_bazilio91_sferra-cloud_pkg_proto.DataRecognitionTask": {
+            "type": "object",
+            "properties": {
+                "client": {
+                    "$ref": "#/definitions/github_com_bazilio91_sferra-cloud_pkg_proto.Client"
+                },
+                "created_at": {
+                    "$ref": "#/definitions/timestamppb.Timestamp"
+                },
+                "error": {
+                    "type": "string"
+                },
+                "frontend_result": {
+                    "$ref": "#/definitions/github_com_bazilio91_sferra-cloud_pkg_proto.TreeNode"
+                },
+                "frontend_result_unrecognized": {
+                    "$ref": "#/definitions/types.JSONValue"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "processed_images": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "recognition_result": {
+                    "$ref": "#/definitions/github_com_bazilio91_sferra-cloud_pkg_proto.TreeNode"
+                },
+                "source_images": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "status": {
+                    "$ref": "#/definitions/github_com_bazilio91_sferra-cloud_pkg_proto.Status"
+                },
+                "updated_at": {
+                    "$ref": "#/definitions/timestamppb.Timestamp"
+                }
+            }
+        },
+        "github_com_bazilio91_sferra-cloud_pkg_proto.FieldStatus": {
+            "type": "integer",
+            "enum": [
+                0,
+                1,
+                2
+            ],
+            "x-enum-varnames": [
+                "FieldStatus_FIELD_STATUS_UNSPECIFIED",
+                "FieldStatus_OK",
+                "FieldStatus_YELLOW"
+            ]
+        },
+        "github_com_bazilio91_sferra-cloud_pkg_proto.Figure": {
+            "type": "object",
+            "properties": {
+                "assortment": {
+                    "$ref": "#/definitions/github_com_bazilio91_sferra-cloud_pkg_proto.Assortment"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "image": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                },
+                "image_id": {
+                    "type": "string"
+                },
+                "mainSize": {
+                    "description": "Types that are valid to be assigned to MainSize:\n\n\t*Figure_MainSizeFloat\n\t*Figure_MainSizeStr"
+                },
+                "mass": {
+                    "type": "number"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "number": {
+                    "type": "string"
+                },
+                "parent_id": {
+                    "type": "string"
+                },
+                "size_horizontal": {
+                    "type": "number"
+                },
+                "size_vertical": {
+                    "type": "number"
+                }
+            }
+        },
+        "github_com_bazilio91_sferra-cloud_pkg_proto.SpecificationRow": {
+            "type": "object",
+            "properties": {
+                "assortment": {
+                    "$ref": "#/definitions/github_com_bazilio91_sferra-cloud_pkg_proto.Assortment"
+                },
+                "count": {
+                    "type": "integer"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "image_id": {
+                    "type": "string"
+                },
+                "material": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "number": {
+                    "type": "string"
+                },
+                "parent_id": {
+                    "type": "string"
+                },
+                "position": {
+                    "type": "integer"
+                },
+                "sb_number": {
+                    "type": "string"
+                },
+                "size": {
+                    "type": "string"
+                },
+                "size_h": {
+                    "type": "string"
+                },
+                "size_v": {
+                    "type": "string"
+                }
+            }
+        },
+        "github_com_bazilio91_sferra-cloud_pkg_proto.Status": {
+            "type": "integer",
+            "enum": [
+                0,
+                1,
+                2,
+                3,
+                4,
+                5,
+                6,
+                7,
+                8,
+                9,
+                10,
+                11,
+                12
+            ],
+            "x-enum-varnames": [
+                "Status_STATUS_UNKNOWN",
+                "Status_STATUS_IMAGES_PENDING",
+                "Status_STATUS_IMAGES_PROCESSING",
+                "Status_STATUS_IMAGES_COMPLETED",
+                "Status_STATUS_IMAGES_FAILED_QUOTA",
+                "Status_STATUS_IMAGES_FAILED_PROCESSING",
+                "Status_STATUS_IMAGES_FAILED_TIMEOUT",
+                "Status_STATUS_RECOGNITION_PENDING",
+                "Status_STATUS_RECOGNITION_PROCESSING",
+                "Status_STATUS_RECOGNITION_COMPLETED",
+                "Status_STATUS_RECOGNITION_FAILED_QUOTA",
+                "Status_STATUS_RECOGNITION_FAILED_PROCESSING",
+                "Status_STATUS_RECOGNITION_FAILED_TIMEOUT"
+            ]
+        },
+        "github_com_bazilio91_sferra-cloud_pkg_proto.TreeNode": {
+            "type": "object",
+            "properties": {
+                "accumulated_count": {
+                    "type": "integer"
+                },
+                "count": {
+                    "type": "integer"
+                },
+                "figure": {
+                    "$ref": "#/definitions/github_com_bazilio91_sferra-cloud_pkg_proto.Figure"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "leaves": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/github_com_bazilio91_sferra-cloud_pkg_proto.TreeNode"
+                    }
+                },
+                "material": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "number": {
+                    "type": "string"
+                },
+                "spec": {
+                    "$ref": "#/definitions/github_com_bazilio91_sferra-cloud_pkg_proto.SpecificationRow"
+                }
+            }
+        },
+        "pkg_api_handlers.AccountInfoResponse": {
+            "type": "object",
+            "properties": {
+                "user": {
+                    "$ref": "#/definitions/github_com_bazilio91_sferra-cloud_pkg_proto.ClientUser"
+                }
+            }
+        },
+        "pkg_api_handlers.DataRecognitionTaskListResponse": {
+            "type": "object",
+            "properties": {
+                "page": {
+                    "type": "integer"
+                },
+                "page_size": {
+                    "type": "integer"
+                },
+                "results": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/github_com_bazilio91_sferra-cloud_pkg_proto.DataRecognitionTask"
+                    }
+                },
+                "total_count": {
+                    "type": "integer"
+                }
+            }
+        },
+        "pkg_api_handlers.ErrorResponse": {
             "type": "object",
             "properties": {
                 "error": {
@@ -162,7 +824,7 @@ const docTemplate = `{
                 }
             }
         },
-        "handlers.LoginInput": {
+        "pkg_api_handlers.LoginInput": {
             "type": "object",
             "required": [
                 "email",
@@ -177,13 +839,17 @@ const docTemplate = `{
                 }
             }
         },
-        "handlers.RegisterInput": {
+        "pkg_api_handlers.RegisterInput": {
             "type": "object",
             "required": [
+                "clientID",
                 "email",
                 "password"
             ],
             "properties": {
+                "clientID": {
+                    "type": "integer"
+                },
                 "email": {
                     "type": "string"
                 },
@@ -193,7 +859,7 @@ const docTemplate = `{
                 }
             }
         },
-        "handlers.SuccessResponse": {
+        "pkg_api_handlers.SuccessResponse": {
             "type": "object",
             "properties": {
                 "message": {
@@ -201,32 +867,46 @@ const docTemplate = `{
                 }
             }
         },
-        "handlers.TokenResponse": {
+        "pkg_api_handlers.TokenResponse": {
             "type": "object",
             "properties": {
                 "token": {
                     "type": "string"
                 }
             }
-        }
-    },
-    "securityDefinitions": {
-        "BearerAuth": {
-            "type": "apiKey",
-            "name": "Authorization",
-            "in": "header"
+        },
+        "timestamppb.Timestamp": {
+            "type": "object",
+            "properties": {
+                "nanos": {
+                    "description": "Non-negative fractions of a second at nanosecond resolution. Negative\nsecond values with fractions must still have non-negative nanos values\nthat count forward in time. Must be from 0 to 999,999,999\ninclusive.",
+                    "type": "integer"
+                },
+                "seconds": {
+                    "description": "Represents seconds of UTC time since Unix epoch\n1970-01-01T00:00:00Z. Must be from 0001-01-01T00:00:00Z to\n9999-12-31T23:59:59Z inclusive.",
+                    "type": "integer"
+                }
+            }
+        },
+        "types.JSONValue": {
+            "type": "object",
+            "properties": {
+                "value": {
+                    "type": "string"
+                }
+            }
         }
     }
 }`
 
 // SwaggerInfo holds exported Swagger Info so clients can modify it
 var SwaggerInfo = &swag.Spec{
-	Version:          "1.0",
-	Host:             "localhost:8080",
-	BasePath:         "/api/v1",
+	Version:          "",
+	Host:             "",
+	BasePath:         "",
 	Schemes:          []string{},
-	Title:            "Sferra Cloud API",
-	Description:      "This is the API documentation for Sferra Cloud.",
+	Title:            "",
+	Description:      "",
 	InfoInstanceName: "swagger",
 	SwaggerTemplate:  docTemplate,
 	LeftDelim:        "{{",

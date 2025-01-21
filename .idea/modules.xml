@@ -3,6 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/sferra-cloud.iml" filepath="$PROJECT_DIR$/sferra-cloud.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../sferra-cloud-python/sferra-cloud-python.iml" filepath="$PROJECT_DIR$/../sferra-cloud-python/sferra-cloud-python.iml" />
     </modules>
   </component>
 </project>

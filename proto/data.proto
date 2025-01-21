@@ -1,0 +1,93 @@
+syntax = "proto3";
+
+package proto;
+
+option go_package = "./pkg/proto;proto";
+//
+// Enums
+//
+
+enum FieldDescription {
+  FIELD_DESCRIPTION_UNSPECIFIED = 0;
+  SIZE = 1;
+  ASSORTMENT = 2;
+  MODEL_SIZE = 3;
+  ALL = 4;
+}
+
+enum FieldStatus {
+  FIELD_STATUS_UNSPECIFIED = 0;
+  OK = 1;
+  YELLOW = 2;
+}
+
+enum RecognitionStatus {
+  RECOGNITION_STATUS_UNSPECIFIED = 0;
+  PENDING = 1;
+  PROCESSING = 2;
+  COMPLETED = 3;
+  FAILED = 4;
+}
+
+//
+// Messages
+//
+
+message Assortment {
+  string material = 1;
+  string name = 2;
+  string size = 3;
+  string chemical_composition = 4;
+  string form_gost = 5;
+  string chemical_gost = 6;
+  string figure_type = 7;
+  string sub_type = 8;
+  map<string, FieldStatus> field_status = 9;
+}
+
+message Figure {
+  string id = 1;
+  string parent_id = 2;
+  bytes image = 3;
+  string image_id = 4;
+  string number = 5;
+  string name = 6;
+  float size_vertical = 7;
+  float size_horizontal = 8;
+
+  oneof main_size {
+    float main_size_float = 9;
+    string main_size_str = 10;
+  }
+
+  Assortment assortment = 11;
+  float mass = 12;
+}
+
+message SpecificationRow {
+  string id = 1;
+  string parent_id = 2;
+  int32 position = 3;
+  string number = 4;
+  string name = 5;
+  string material = 6;
+  int32 count = 7;
+  string size = 8;
+  string size_v = 9;
+  string size_h = 10;
+  Assortment assortment = 11;
+  string image_id = 12;
+  string sb_number = 13;
+}
+
+message TreeNode {
+  string id = 1;
+  string number = 2;
+  string name = 3;
+  int32 count = 4;
+  string material = 5;
+  SpecificationRow spec = 6;
+  Figure figure = 7;
+  int32 accumulated_count = 8;
+  repeated TreeNode leaves = 9;
+}

@@ -1,0 +1,23 @@
+{{ define "content" }}
+<div class="container mx-auto mt-10 max-w-md">
+    <h1 class="text-2xl font-bold mb-4">Edit Client</h1>
+    {{ if .Error }}
+    <div class="bg-red-200 text-red-800 p-2 mb-4">
+        {{ .Error }}
+    </div>
+    {{ end }}
+    <form method="POST" action="/clients/{{ .Client.ID }}">
+        <div class="mb-4">
+            <label for="name" class="block text-gray-700">Name</label>
+            <input type="text" name="name" id="name" class="border border-gray-300 p-2 w-full" value="{{ .Client.Name }}" required>
+        </div>
+        <div class="mb-4">
+            <label for="quota" class="block text-gray-700">Quota</label>
+            <input type="number" name="quota" id="quota" class="border border-gray-300 p-2 w-full" value="{{ .Client.Quota }}" required>
+        </div>
+        <button type="submit" class="bg-blue-500 text-white px-4 py-2">Update</button>
+    </form>
+</div>
+{{ end }}
+
+{{ template "layout" . }}

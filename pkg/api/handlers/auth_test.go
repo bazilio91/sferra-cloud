@@ -2,135 +2,140 @@ package handlers_test
 
 import (
 	"bytes"
-	"context"
 	"encoding/json"
-	"github.com/bazilio91/sferra-cloud/pkg/db"
-	"github.com/bazilio91/sferra-cloud/pkg/models"
-	"gorm.io/driver/postgres"
-	"gorm.io/gorm"
+	"github.com/bazilio91/sferra-cloud/pkg/proto"
 	"net/http"
 	"net/http/httptest"
-	"testing"
 
 	"github.com/bazilio91/sferra-cloud/pkg/api/handlers"
-	"github.com/bazilio91/sferra-cloud/pkg/api/router"
-	"github.com/bazilio91/sferra-cloud/pkg/auth"
+	"github.com/bazilio91/sferra-cloud/pkg/db"
 	"github.com/bazilio91/sferra-cloud/pkg/testutils"
-	"github.com/gin-gonic/gin"
-	"github.com/stretchr/testify/assert"
+	. "github.com/onsi/ginkgo/v2"
+	. "github.com/onsi/gomega"
 )
 
-func TestMain(m *testing.M) {
-	testutils.SetupTest(m)
-}
+var _ = Describe("Auth Handlers", func() {
+	var (
+		client *proto.Client
+	)
 
-func TestLogin(t *testing.T) {
-	// Set Gin to Test Mode
-	gin.SetMode(gin.TestMode)
+	BeforeEach(func() {
+		testutils.ClearDatabase(DB)
 
-	ctx := context.Background()
+		var err error
+		client, err = testutils.CreateTestClient(DB, "Test Client", 100)
+		Expect(err).NotTo(HaveOccurred())
+	})
 
-	// Start test database container
-	testDB, err := testutils.StartTestDBContainer(ctx)
-	if err != nil {
-		t.Fatalf("Failed to start test database: %v", err)
-	}
-	defer testutils.StopTestDBContainer(ctx, testDB)
+	Describe("Login", func() {
+		Context("With valid credentials", func() {
+			It("should return a token", func() {
+				// Create test user
+				_, err := testutils.CreateTestUser(DB, "test@example.com", "password123", client.Id)
+				Expect(err).NotTo(HaveOccurred())
 
-	// Clear database before test
-	testutils.ClearDatabase()
+				// Create test request
+				loginInput := handlers.LoginInput{
+					Email:    "test@example.com",
+					Password: "password123",
+				}
+				jsonValue, _ := json.Marshal(loginInput)
+				req, _ := http.NewRequest("POST", "/api/v1/auth/login", bytes.NewBuffer(jsonValue))
+				req.Header.Set("Content-Type", "application/json")
 
-	// Create test user
-	err = testutils.CreateTestUser("test@example.com", "password123")
-	if err != nil {
-		t.Fatalf("Failed to create test user: %v", err)
-	}
+				// Perform request
+				resp := httptest.NewRecorder()
+				r.ServeHTTP(resp, req)
 
-	// Initialize JWT manager
-	jwtManager := auth.NewJWTManager(testDB.Config.JWTSecret)
-	handlers.SetJWTManager(jwtManager)
-	handlers.SetConfig(testDB.Config)
+				// Assertions
+				Expect(resp.Code).To(Equal(http.StatusOK))
+				var response handlers.TokenResponse
+				json.Unmarshal(resp.Body.Bytes(), &response)
+				Expect(response.Token).NotTo(BeEmpty())
+			})
+		})
 
-	// Create router
-	r := router.SetupRouter(jwtManager, testDB.Config)
+		Context("With invalid credentials", func() {
+			It("should return an error", func() {
+				// Create test user with a different password
+				_, err := testutils.CreateTestUser(DB, "test@example.com", "password123", client.Id)
+				Expect(err).NotTo(HaveOccurred())
 
-	// Create test request
-	loginInput := handlers.LoginInput{
-		Email:    "test@example.com",
-		Password: "password123",
-	}
-	jsonValue, _ := json.Marshal(loginInput)
-	req, _ := http.NewRequest("POST", "/api/v1/auth/login", bytes.NewBuffer(jsonValue))
-	req.Header.Set("Content-Type", "application/json")
+				// Create test request with incorrect password
+				loginInput := handlers.LoginInput{
+					Email:    "test@example.com",
+					Password: "wrongpassword",
+				}
+				jsonValue, _ := json.Marshal(loginInput)
+				req, _ := http.NewRequest("POST", "/api/v1/auth/login", bytes.NewBuffer(jsonValue))
+				req.Header.Set("Content-Type", "application/json")
 
-	// Perform request
-	resp := httptest.NewRecorder()
-	r.ServeHTTP(resp, req)
+				// Perform request
+				resp := httptest.NewRecorder()
+				r.ServeHTTP(resp, req)
 
-	// Assertions
-	assert.Equal(t, http.StatusOK, resp.Code)
-	var response handlers.TokenResponse
-	json.Unmarshal(resp.Body.Bytes(), &response)
-	assert.NotEmpty(t, response.Token)
-}
+				// Assertions
+				Expect(resp.Code).To(Equal(http.StatusUnauthorized))
+				var response handlers.ErrorResponse
+				json.Unmarshal(resp.Body.Bytes(), &response)
+				Expect(response.Error).To(Equal("Invalid email or password"))
+			})
+		})
+	})
 
-func TestRegister(t *testing.T) {
-	// Set Gin to Test Mode
-	gin.SetMode(gin.TestMode)
+	Describe("Register", func() {
+		Context("With valid input", func() {
+			It("should create a new user", func() {
+				// Create test request
+				registerInput := handlers.RegisterInput{
+					Email:    "newuser@example.com",
+					Password: "password123",
+					ClientID: client.Id,
+				}
+				jsonValue, _ := json.Marshal(registerInput)
+				req, _ := http.NewRequest("POST", "/api/v1/auth/register", bytes.NewBuffer(jsonValue))
+				req.Header.Set("Content-Type", "application/json")
 
-	ctx := context.Background()
+				// Perform request
+				resp := httptest.NewRecorder()
+				r.ServeHTTP(resp, req)
 
-	// Start test database container
-	testDB, err := testutils.StartTestDBContainer(ctx)
-	if err != nil {
-		t.Fatalf("Failed to start test database: %v", err)
-	}
-	defer testutils.StopTestDBContainer(ctx, testDB)
+				// Assertions
+				Expect(resp.Code).To(Equal(http.StatusOK))
+				var response handlers.SuccessResponse
+				json.Unmarshal(resp.Body.Bytes(), &response)
+				Expect(response.Message).To(Equal("User created successfully"))
 
-	// Clear database before test
-	testutils.ClearDatabase()
+				// Verify that the user was created
+				var count int64
+				err := db.DB.Model(&proto.ClientUser{}).Where("email = ?", "newuser@example.com").Count(&count).Error
+				Expect(err).NotTo(HaveOccurred())
+				Expect(count).To(Equal(int64(1)))
+			})
+		})
 
-	// Initialize JWT manager
-	jwtManager := auth.NewJWTManager(testDB.Config.JWTSecret)
-	handlers.SetJWTManager(jwtManager)
-	handlers.SetConfig(testDB.Config)
+		Context("With invalid input", func() {
+			It("should return an error when client ID is invalid", func() {
+				// Create test request with invalid client ID
+				registerInput := handlers.RegisterInput{
+					Email:    "newuser@example.com",
+					Password: "password123",
+					ClientID: 9999, // Non-existent client ID
+				}
+				jsonValue, _ := json.Marshal(registerInput)
+				req, _ := http.NewRequest("POST", "/api/v1/auth/register", bytes.NewBuffer(jsonValue))
+				req.Header.Set("Content-Type", "application/json")
 
-	// Create router
-	r := router.SetupRouter(jwtManager, testDB.Config)
+				// Perform request
+				resp := httptest.NewRecorder()
+				r.ServeHTTP(resp, req)
 
-	// Create test request
-	registerInput := handlers.RegisterInput{
-		Email:    "newuser@example.com",
-		Password: "password123",
-	}
-	jsonValue, _ := json.Marshal(registerInput)
-	req, _ := http.NewRequest("POST", "/api/v1/auth/register", bytes.NewBuffer(jsonValue))
-	req.Header.Set("Content-Type", "application/json")
-
-	// Perform request
-	resp := httptest.NewRecorder()
-	r.ServeHTTP(resp, req)
-
-	// Assertions
-	assert.Equal(t, http.StatusOK, resp.Code)
-	var response handlers.SuccessResponse
-	json.Unmarshal(resp.Body.Bytes(), &response)
-	assert.Equal(t, "User created successfully", response.Message)
-
-	// Verify that the user was created
-	var count int64
-	//db := testDB.Config
-	//db.DBHost = testDB.Config.DBHost
-	//db.DBPort = testDB.Config.DBPort
-
-	// Initialize the database connection
-	dsn := db.GetDSN(testDB.Config)
-	dbInstance, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
-	if err != nil {
-		t.Fatalf("Failed to connect to database: %v", err)
-	}
-
-	// Count users with the new email
-	dbInstance.Model(&models.User{}).Where("email = ?", "newuser@example.com").Count(&count)
-	assert.Equal(t, int64(1), count)
-}
+				// Assertions
+				Expect(resp.Code).To(Equal(http.StatusBadRequest))
+				var response handlers.ErrorResponse
+				json.Unmarshal(resp.Body.Bytes(), &response)
+				Expect(response.Error).To(Equal("Invalid Client ID"))
+			})
+		})
+	})
+})

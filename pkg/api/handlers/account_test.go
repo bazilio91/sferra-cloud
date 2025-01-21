@@ -1,70 +1,74 @@
 package handlers_test
 
 import (
-	"context"
 	"encoding/json"
+	"github.com/bazilio91/sferra-cloud/pkg/proto"
 	"net/http"
 	"net/http/httptest"
-	"testing"
 
 	"github.com/bazilio91/sferra-cloud/pkg/api/handlers"
-	"github.com/bazilio91/sferra-cloud/pkg/api/router"
-	"github.com/bazilio91/sferra-cloud/pkg/auth"
 	"github.com/bazilio91/sferra-cloud/pkg/testutils"
-	"github.com/gin-gonic/gin"
-	"github.com/stretchr/testify/assert"
+	. "github.com/onsi/ginkgo/v2"
+	. "github.com/onsi/gomega"
 )
 
-func TestGetAccountInfo(t *testing.T) {
-	// Set Gin to Test Mode
-	gin.SetMode(gin.TestMode)
+var _ = Describe("Account Handlers", func() {
+	var (
+		clientModel *proto.Client
+		userModel   *proto.ClientUser
+	)
 
-	ctx := context.Background()
+	BeforeEach(func() {
+		testutils.ClearDatabase(DB)
 
-	// Start test database container
-	testDB, err := testutils.StartTestDBContainer(ctx)
-	if err != nil {
-		t.Fatalf("Failed to start test database: %v", err)
-	}
-	defer testutils.StopTestDBContainer(ctx, testDB)
+		var err error
+		clientModel, err = testutils.CreateTestClient(DB, "Test Client", 100)
+		Expect(err).NotTo(HaveOccurred())
 
-	// Clear database before test
-	testutils.ClearDatabase()
+		userModel, err = testutils.CreateTestUser(DB, "test@example.com", "password123", clientModel.Id)
+		Expect(err).NotTo(HaveOccurred())
+	})
 
-	// Create test user
-	err = testutils.CreateTestUser("test@example.com", "password123")
-	if err != nil {
-		t.Fatalf("Failed to create test user: %v", err)
-	}
+	Describe("GetAccountInfo", func() {
+		Context("With valid token", func() {
+			It("should return account information", func() {
+				// Generate token
+				token, err := jwtManager.GenerateToken(userModel.Id, userModel.ClientId)
+				Expect(err).NotTo(HaveOccurred())
 
-	// Initialize JWT manager
-	jwtManager := auth.NewJWTManager(testDB.Config.JWTSecret)
-	handlers.SetJWTManager(jwtManager)
-	handlers.SetConfig(testDB.Config)
+				// Create test request
+				req, _ := http.NewRequest("GET", "/api/v1/account", nil)
+				req.Header.Set("Authorization", "Bearer "+token)
 
-	// Create router
-	r := router.SetupRouter(jwtManager, testDB.Config)
+				// Perform request
+				resp := httptest.NewRecorder()
+				r.ServeHTTP(resp, req)
 
-	// Generate token
-	token, err := jwtManager.GenerateJWT(1) // Assuming the user ID is 1
-	if err != nil {
-		t.Fatalf("Failed to generate token: %v", err)
-	}
+				// Assertions
+				Expect(resp.Code).To(Equal(http.StatusOK))
+				var response handlers.AccountInfoResponse
+				err = json.Unmarshal(resp.Body.Bytes(), &response)
+				Expect(err).NotTo(HaveOccurred())
+				Expect(response.User.Email).To(Equal("test@example.com"))
+				Expect(response.User.Client.Quota).To(Equal(clientModel.Quota))
+			})
+		})
 
-	// Create test request
-	req, _ := http.NewRequest("GET", "/api/v1/account", nil)
-	req.Header.Set("Authorization", "Bearer "+token)
+		Context("With invalid token", func() {
+			It("should return unauthorized error", func() {
+				// Create test request without token
+				req, _ := http.NewRequest("GET", "/api/v1/account", nil)
 
-	// Perform request
-	resp := httptest.NewRecorder()
-	r.ServeHTTP(resp, req)
+				// Perform request
+				resp := httptest.NewRecorder()
+				r.ServeHTTP(resp, req)
 
-	// Assertions
-	assert.Equal(t, http.StatusOK, resp.Code)
-	var response handlers.AccountInfoResponse
-	err = json.Unmarshal(resp.Body.Bytes(), &response)
-	if err != nil {
-		t.Fatalf("Failed to unmarshal response: %v", err)
-	}
-	assert.Equal(t, "test@example.com", response.Email)
-}
+				// Assertions
+				Expect(resp.Code).To(Equal(http.StatusUnauthorized))
+				var response handlers.ErrorResponse
+				json.Unmarshal(resp.Body.Bytes(), &response)
+				Expect(response.Error).To(Equal("Authorization header missing"))
+			})
+		})
+	})
+})

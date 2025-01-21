@@ -1,0 +1,60 @@
+syntax = "proto3";
+
+package proto;
+
+option go_package = "./pkg/proto;proto";
+
+import "proto/data.proto";
+
+service TaskService {
+  rpc Subscribe(SubscribeRequest) returns (stream SubscribeTaskResponse);
+  rpc ReserveTask(ReserveTaskRequest) returns (ReserveTaskResponse);
+  rpc ReportTaskStatus(ReportTaskStatusRequest) returns (Ack);
+  rpc FinishTask(FinishTaskRequest) returns (Ack);
+  rpc FailTask(FailTaskRequest) returns (Ack);
+}
+
+enum Queues {
+  QUEUE_IMAGE_PROCESSING = 0;
+  QUEUE_DATA_RECOGNITION = 1;
+}
+
+message Ack {
+  bool success = 1;
+}
+
+message SubscribeRequest {
+  Queues queue = 1;
+}
+
+message ReserveTaskRequest {
+  string task_id = 1;
+  string worker_id = 2;
+}
+
+message ReserveTaskResponse {
+  bool success = 1;
+}
+
+message ReportTaskStatusRequest {
+  string task_id = 1;
+  string status = 2;
+}
+
+message SubscribeTaskResponse {
+  string task_id = 1;
+}
+
+message FinishTaskRequest {
+  string id = 1;
+  string worker_id = 2;
+
+  repeated string processed_images = 11;
+  optional TreeNode recognition_result = 12;
+}
+
+message FailTaskRequest {
+  string id = 1;
+  string worker_id = 2;
+  string error = 3;
+}

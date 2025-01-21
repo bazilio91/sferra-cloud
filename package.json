@@ -1,0 +1,17 @@
+{
+  "name": "sferra-cloud",
+  "version": "1.0.0",
+  "description": "Cloud layer for calculating the cost of manufacturing parts.",
+  "main": "index.js",
+  "scripts": {
+    "build:css": "npx tailwindcss -i ./src/css/styles.css -o ./static/css/styles.css --watch"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "autoprefixer": "^10.4.20",
+    "postcss": "^8.4.49",
+    "tailwindcss": "^3.4.15"
+  }
+}

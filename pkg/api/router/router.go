@@ -7,6 +7,7 @@ import (
 	"github.com/bazilio91/sferra-cloud/pkg/api/middleware"
 	"github.com/bazilio91/sferra-cloud/pkg/auth"
 	"github.com/bazilio91/sferra-cloud/pkg/config"
+	"github.com/bazilio91/sferra-cloud/pkg/services/storage"
 	"github.com/gin-gonic/gin"
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
@@ -17,6 +18,10 @@ func SetupRouter(jwtManager *auth.JWTManager, cfg *config.Config) *gin.Engine {
 
 	// Initialize middleware with JWT manager
 	middleware.SetJWTManager(jwtManager)
+
+	// Initialize S3 client and image handler
+	s3Client := storage.NewS3Client(cfg)
+	imageHandler := handlers.NewImageHandler(s3Client)
 
 	// Swagger endpoint
 	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
@@ -32,7 +37,17 @@ func SetupRouter(jwtManager *auth.JWTManager, cfg *config.Config) *gin.Engine {
 		apiAuth.Use(middleware.JWTAuthMiddleware())
 		{
 			apiAuth.GET("/account", handlers.GetAccountInfo)
-			// Other protected routes
+
+			// Data Recognition Task routes
+			apiAuth.POST("/recognition_tasks", handlers.CreateDataRecognitionTask)
+			apiAuth.GET("/recognition_tasks", handlers.ListDataRecognitionTask)
+			apiAuth.GET("/recognition_tasks/:id", handlers.GetDataRecognitionTask)
+			apiAuth.PUT("/recognition_tasks/:id", handlers.UpdateDataRecognitionTask)
+			apiAuth.DELETE("/recognition_tasks/:id", handlers.DeleteDataRecognitionTask)
+
+			// Image routes
+			apiAuth.POST("/images/upload", imageHandler.UploadImage)
+			apiAuth.GET("/images/:id", imageHandler.GetImage)
 		}
 	}
 

@@ -1,3 +1,4 @@
+// pkg/api/middleware/jwt.go
 package middleware
 
 import (
@@ -30,15 +31,17 @@ func JWTAuthMiddleware() gin.HandlerFunc {
 			return
 		}
 
-		userID, err := jwtManager.ValidateToken(parts[1])
+		claims, err := jwtManager.VerifyJWT(parts[1])
 		if err != nil {
-			c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid token"})
+			c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid token: " + err.Error()})
 			c.Abort()
 			return
 		}
 
-		// Store userID in context
-		c.Set("userID", userID)
+		// Store claims in context
+		c.Set("claims", claims)
+		c.Set("userID", claims.UserID)
+		c.Set("clientID", claims.ClientID)
 		c.Next()
 	}
 }

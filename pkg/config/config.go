@@ -9,14 +9,22 @@ import (
 )
 
 type Config struct {
-	DBHost         string
-	DBPort         string
-	DBUser         string
-	DBPassword     string
-	DBName         string
-	JWTSecret      string
-	APIServerPort  string
-	GRPCServerPort string
+	DBHost          string
+	DBPort          string
+	DBUser          string
+	DBPassword      string
+	DBName          string
+	JWTSecret       string
+	APIServerPort   string
+	GRPCServerPort  string
+	AdminServerPort string
+	
+	// S3 Configuration
+	S3Endpoint        string
+	S3Region          string
+	S3Bucket          string
+	S3AccessKeyID     string
+	S3SecretAccessKey string
 }
 
 func LoadConfig() (*Config, error) {
@@ -26,14 +34,22 @@ func LoadConfig() (*Config, error) {
 	}
 
 	cfg := &Config{
-		DBHost:         os.Getenv("DB_HOST"),
-		DBPort:         os.Getenv("DB_PORT"),
-		DBUser:         os.Getenv("DB_USER"),
-		DBPassword:     os.Getenv("DB_PASSWORD"),
-		DBName:         os.Getenv("DB_NAME"),
-		JWTSecret:      os.Getenv("JWT_SECRET"),
-		APIServerPort:  os.Getenv("API_SERVER_PORT"),
-		GRPCServerPort: os.Getenv("GRPC_SERVER_PORT"),
+		DBHost:          os.Getenv("DB_HOST"),
+		DBPort:          os.Getenv("DB_PORT"),
+		DBUser:          os.Getenv("DB_USER"),
+		DBPassword:      os.Getenv("DB_PASSWORD"),
+		DBName:          os.Getenv("DB_NAME"),
+		JWTSecret:       os.Getenv("JWT_SECRET"),
+		APIServerPort:   os.Getenv("API_SERVER_PORT"),
+		GRPCServerPort:  os.Getenv("GRPC_SERVER_PORT"),
+		AdminServerPort: os.Getenv("ADMIN_SERVER_PORT"),
+		
+		// S3 Configuration
+		S3Endpoint:        os.Getenv("S3_ENDPOINT"),
+		S3Region:          os.Getenv("S3_REGION"),
+		S3Bucket:          os.Getenv("S3_BUCKET"),
+		S3AccessKeyID:     os.Getenv("S3_ACCESS_KEY_ID"),
+		S3SecretAccessKey: os.Getenv("S3_SECRET_ACCESS_KEY"),
 	}
 
 	// Validate configuration
@@ -77,6 +93,24 @@ func (cfg *Config) validate() error {
 	}
 	if _, err := strconv.Atoi(cfg.GRPCServerPort); err != nil {
 		return errors.New("GRPC_SERVER_PORT must be a number")
+	}
+	if cfg.AdminServerPort == "" {
+		cfg.AdminServerPort = "8081" // Default port
+	}
+	if cfg.S3Endpoint == "" {
+		return errors.New("S3_ENDPOINT is not set")
+	}
+	if cfg.S3Region == "" {
+		return errors.New("S3_REGION is not set")
+	}
+	if cfg.S3Bucket == "" {
+		return errors.New("S3_BUCKET is not set")
+	}
+	if cfg.S3AccessKeyID == "" {
+		return errors.New("S3_ACCESS_KEY_ID is not set")
+	}
+	if cfg.S3SecretAccessKey == "" {
+		return errors.New("S3_SECRET_ACCESS_KEY is not set")
 	}
 	return nil
 }

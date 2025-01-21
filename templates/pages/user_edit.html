@@ -1,0 +1,31 @@
+{{ define "content" }}
+<div class="container mx-auto mt-10 max-w-md">
+    <h1 class="text-2xl font-bold mb-4">Edit User</h1>
+    {{ if .Error }}
+    <div class="bg-red-200 text-red-800 p-2 mb-4">
+        {{ .Error }}
+    </div>
+    {{ end }}
+    <form method="POST" action="/users/{{ .User.ID }}">
+        <div class="mb-4">
+            <label for="email" class="block text-gray-700">Email</label>
+            <input type="email" name="email" id="email" class="border border-gray-300 p-2 w-full" value="{{ .User.Email }}" required>
+        </div>
+        <div class="mb-4">
+            <label for="password" class="block text-gray-700">Password (leave blank to keep current password)</label>
+            <input type="password" name="password" id="password" class="border border-gray-300 p-2 w-full">
+        </div>
+        <div class="mb-4">
+            <label for="client_id" class="block text-gray-700">Client</label>
+            <select name="client_id" id="client_id" class="border border-gray-300 p-2 w-full" required>
+                {{ range .Clients }}
+                <option value="{{ .ID }}" {{ if eq .ID $.User.ClientID }}selected{{ end }}>{{ .Name }}</option>
+                {{ end }}
+            </select>
+        </div>
+        <button type="submit" class="bg-blue-500 text-white px-4 py-2">Update</button>
+    </form>
+</div>
+{{ end }}
+
+{{ template "layout" . }}

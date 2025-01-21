@@ -2,49 +2,56 @@
 package auth
 
 import (
-	"errors"
 	"time"
 
-	"github.com/dgrijalva/jwt-go"
+	"github.com/golang-jwt/jwt/v5"
 )
 
 type JWTManager struct {
-	secretKey string
+	secretKey     string
+	tokenDuration time.Duration
 }
 
-func NewJWTManager(secretKey string) *JWTManager {
-	return &JWTManager{secretKey: secretKey}
+func NewJWTManager(secretKey string, tokenDuration time.Duration) *JWTManager {
+	return &JWTManager{
+		secretKey:     secretKey,
+		tokenDuration: tokenDuration,
+	}
 }
 
-func (manager *JWTManager) GenerateJWT(userID uint) (string, error) {
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-		"userID": userID,
-		"exp":    time.Now().Add(time.Hour * 72).Unix(),
-	})
+func (manager *JWTManager) GenerateToken(userID, clientID uint64) (string, error) {
+	claims := &Claims{
+		UserID:   userID,
+		ClientID: clientID,
+		RegisteredClaims: jwt.RegisteredClaims{
+			ExpiresAt: jwt.NewNumericDate(time.Now().Add(manager.tokenDuration)),
+		},
+	}
 
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	return token.SignedString([]byte(manager.secretKey))
 }
 
-func (manager *JWTManager) ValidateToken(tokenString string) (uint, error) {
-	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
-		// Ensure the signing method is HMAC
-		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
-			return nil, errors.New("unexpected signing method")
-		}
-		return []byte(manager.secretKey), nil
-	})
+func (manager *JWTManager) VerifyJWT(tokenString string) (*Claims, error) {
+	token, err := jwt.ParseWithClaims(
+		tokenString,
+		&Claims{},
+		func(token *jwt.Token) (interface{}, error) {
+			if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+				return nil, jwt.ErrInvalidKey
+			}
+			return []byte(manager.secretKey), nil
+		},
+	)
 
 	if err != nil {
-		return 0, err
+		return nil, err
 	}
 
-	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
-		userIDFloat, ok := claims["userID"].(float64)
-		if !ok {
-			return 0, errors.New("invalid token claims")
-		}
-		return uint(userIDFloat), nil
-	} else {
-		return 0, errors.New("invalid token")
+	claims, ok := token.Claims.(*Claims)
+	if !ok || !token.Valid {
+		return nil, jwt.ErrInvalidKey
 	}
+
+	return claims, nil
 }

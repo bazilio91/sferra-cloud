@@ -1,0 +1,61 @@
+{{ define "content" }}
+<div class="container mx-auto mt-10">
+    <h1 class="text-2xl font-bold mb-4">Clients</h1>
+    <a href="/clients/new" class="bg-blue-500 text-white px-4 py-2">Add New Client</a>
+
+    <!-- Filter Form -->
+    <form method="GET" action="/clients" class="mt-4">
+        <div class="flex space-x-4">
+            <div>
+                <label for="id" class="block text-gray-700">ID</label>
+                <input type="text" name="id" id="id" value="{{ .IDFilter }}" class="border border-gray-300 p-2">
+            </div>
+            <div>
+                <label for="name" class="block text-gray-700">Name</label>
+                <input type="text" name="name" id="name" value="{{ .NameFilter }}" class="border border-gray-300 p-2">
+            </div>
+            <div class="flex items-end">
+                <button type="submit" class="bg-blue-500 text-white px-4 py-2">Filter</button>
+            </div>
+        </div>
+    </form>
+
+    {{ if .Error }}
+    <div class="bg-red-200 text-red-800 p-2 mb-4">
+        {{ .Error }}
+    </div>
+    {{ end }}
+    <table class="table-auto w-full mt-4">
+        <thead>
+        <tr>
+            <th class="px-4 py-2">ID</th>
+            <th class="px-4 py-2">Name</th>
+            <th class="px-4 py-2">Quota</th>
+            <th class="px-4 py-2">Actions</th>
+        </tr>
+        </thead>
+        <tbody>
+        {{ range .Clients }}
+        <tr>
+            <td class="border px-4 py-2">{{ .ID }}</td>
+            <td class="border px-4 py-2">{{ .Name }}</td>
+            <td class="border px-4 py-2">{{ .Quota }}</td>
+            <td class="border px-4 py-2">
+                <a href="/clients/{{ .ID }}" class="text-blue-500">View</a> |
+                <a href="/clients/{{ .ID }}/edit" class="text-blue-500">Edit</a> |
+                <form action="/clients/{{ .ID }}/delete" method="POST" style="display:inline;">
+                    <button type="submit" class="text-red-500">Delete</button>
+                </form>
+            </td>
+        </tr>
+        {{ else }}
+        <tr>
+            <td colspan="4" class="text-center p-4">No clients found.</td>
+        </tr>
+        {{ end }}
+        </tbody>
+    </table>
+</div>
+{{ end }}
+
+{{ template "layout" . }}

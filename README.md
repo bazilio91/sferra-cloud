@@ -40,6 +40,12 @@ sudo apt-get install -y protobuf-compiler
 go install google.golang.org/protobuf/cmd/protoc-gen-go@latest
 go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@latest
 
+go get github.com/cosmos/gogoproto/proto
+go install github.com/cosmos/gogoproto/protoc-gen-gogofaster 
+go get github.com/cosmos/gogoproto/gogoproto
+
+go install github.com/infobloxopen/protoc-gen-gorm@latest
+
 # Install swag for Swagger documentation
 go install github.com/swaggo/swag/cmd/swag@latest
 ```
@@ -73,7 +79,12 @@ go run cmd/grpc/main.go
 ```
 
 ## Running Tests
-    
+
+```bash
+go get -u github.com/onsi/ginkgo/v2/ginkgo
+go get -u github.com/onsi/gomega/...
+```
+
 ```bash
 go test ./...
 ```

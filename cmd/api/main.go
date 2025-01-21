@@ -3,6 +3,7 @@ package main
 
 import (
 	"log"
+	"time"
 
 	"github.com/bazilio91/sferra-cloud/pkg/api/handlers"
 	"github.com/bazilio91/sferra-cloud/pkg/api/middleware"
@@ -25,7 +26,7 @@ func main() {
 	}
 
 	// Initialize JWT manager
-	jwtManager := auth.NewJWTManager(cfg.JWTSecret)
+	jwtManager := auth.NewJWTManager(cfg.JWTSecret, time.Hour*24) // 24 hour token duration
 	handlers.SetJWTManager(jwtManager)
 	middleware.SetJWTManager(jwtManager)
 

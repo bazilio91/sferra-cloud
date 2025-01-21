@@ -1,16 +1,237 @@
-basePath: /api/v1
 definitions:
-  handlers.AccountInfoResponse:
+  github_com_bazilio91_sferra-cloud_pkg_proto.Assortment:
     properties:
-      email:
+      chemical_composition:
+        type: string
+      chemical_gost:
+        type: string
+      field_status:
+        additionalProperties:
+          $ref: '#/definitions/github_com_bazilio91_sferra-cloud_pkg_proto.FieldStatus'
+        type: object
+      figure_type:
+        type: string
+      form_gost:
+        type: string
+      material:
+        type: string
+      name:
+        type: string
+      size:
+        type: string
+      sub_type:
         type: string
     type: object
-  handlers.ErrorResponse:
+  github_com_bazilio91_sferra-cloud_pkg_proto.Client:
+    properties:
+      created_at:
+        type: integer
+      id:
+        type: integer
+      inn:
+        type: integer
+      name:
+        type: string
+      ogrn:
+        type: integer
+      owner_fio:
+        type: string
+      quota:
+        type: integer
+      updated_at:
+        type: integer
+    type: object
+  github_com_bazilio91_sferra-cloud_pkg_proto.ClientUser:
+    properties:
+      Password:
+        type: string
+      Username:
+        type: string
+      client:
+        $ref: '#/definitions/github_com_bazilio91_sferra-cloud_pkg_proto.Client'
+      client_id:
+        type: integer
+      created_at:
+        type: integer
+      email:
+        type: string
+      id:
+        type: integer
+      updated_at:
+        type: integer
+    type: object
+  github_com_bazilio91_sferra-cloud_pkg_proto.DataRecognitionTask:
+    properties:
+      client:
+        $ref: '#/definitions/github_com_bazilio91_sferra-cloud_pkg_proto.Client'
+      created_at:
+        $ref: '#/definitions/timestamppb.Timestamp'
+      error:
+        type: string
+      frontend_result:
+        $ref: '#/definitions/github_com_bazilio91_sferra-cloud_pkg_proto.TreeNode'
+      frontend_result_unrecognized:
+        $ref: '#/definitions/types.JSONValue'
+      id:
+        type: string
+      processed_images:
+        items:
+          type: string
+        type: array
+      recognition_result:
+        $ref: '#/definitions/github_com_bazilio91_sferra-cloud_pkg_proto.TreeNode'
+      source_images:
+        items:
+          type: string
+        type: array
+      status:
+        $ref: '#/definitions/github_com_bazilio91_sferra-cloud_pkg_proto.Status'
+      updated_at:
+        $ref: '#/definitions/timestamppb.Timestamp'
+    type: object
+  github_com_bazilio91_sferra-cloud_pkg_proto.FieldStatus:
+    enum:
+    - 0
+    - 1
+    - 2
+    type: integer
+    x-enum-varnames:
+    - FieldStatus_FIELD_STATUS_UNSPECIFIED
+    - FieldStatus_OK
+    - FieldStatus_YELLOW
+  github_com_bazilio91_sferra-cloud_pkg_proto.Figure:
+    properties:
+      assortment:
+        $ref: '#/definitions/github_com_bazilio91_sferra-cloud_pkg_proto.Assortment'
+      id:
+        type: string
+      image:
+        items:
+          type: integer
+        type: array
+      image_id:
+        type: string
+      mainSize:
+        description: "Types that are valid to be assigned to MainSize:\n\n\t*Figure_MainSizeFloat\n\t*Figure_MainSizeStr"
+      mass:
+        type: number
+      name:
+        type: string
+      number:
+        type: string
+      parent_id:
+        type: string
+      size_horizontal:
+        type: number
+      size_vertical:
+        type: number
+    type: object
+  github_com_bazilio91_sferra-cloud_pkg_proto.SpecificationRow:
+    properties:
+      assortment:
+        $ref: '#/definitions/github_com_bazilio91_sferra-cloud_pkg_proto.Assortment'
+      count:
+        type: integer
+      id:
+        type: string
+      image_id:
+        type: string
+      material:
+        type: string
+      name:
+        type: string
+      number:
+        type: string
+      parent_id:
+        type: string
+      position:
+        type: integer
+      sb_number:
+        type: string
+      size:
+        type: string
+      size_h:
+        type: string
+      size_v:
+        type: string
+    type: object
+  github_com_bazilio91_sferra-cloud_pkg_proto.Status:
+    enum:
+    - 0
+    - 1
+    - 2
+    - 3
+    - 4
+    - 5
+    - 6
+    - 7
+    - 8
+    - 9
+    - 10
+    - 11
+    - 12
+    type: integer
+    x-enum-varnames:
+    - Status_STATUS_UNKNOWN
+    - Status_STATUS_IMAGES_PENDING
+    - Status_STATUS_IMAGES_PROCESSING
+    - Status_STATUS_IMAGES_COMPLETED
+    - Status_STATUS_IMAGES_FAILED_QUOTA
+    - Status_STATUS_IMAGES_FAILED_PROCESSING
+    - Status_STATUS_IMAGES_FAILED_TIMEOUT
+    - Status_STATUS_RECOGNITION_PENDING
+    - Status_STATUS_RECOGNITION_PROCESSING
+    - Status_STATUS_RECOGNITION_COMPLETED
+    - Status_STATUS_RECOGNITION_FAILED_QUOTA
+    - Status_STATUS_RECOGNITION_FAILED_PROCESSING
+    - Status_STATUS_RECOGNITION_FAILED_TIMEOUT
+  github_com_bazilio91_sferra-cloud_pkg_proto.TreeNode:
+    properties:
+      accumulated_count:
+        type: integer
+      count:
+        type: integer
+      figure:
+        $ref: '#/definitions/github_com_bazilio91_sferra-cloud_pkg_proto.Figure'
+      id:
+        type: string
+      leaves:
+        items:
+          $ref: '#/definitions/github_com_bazilio91_sferra-cloud_pkg_proto.TreeNode'
+        type: array
+      material:
+        type: string
+      name:
+        type: string
+      number:
+        type: string
+      spec:
+        $ref: '#/definitions/github_com_bazilio91_sferra-cloud_pkg_proto.SpecificationRow'
+    type: object
+  pkg_api_handlers.AccountInfoResponse:
+    properties:
+      user:
+        $ref: '#/definitions/github_com_bazilio91_sferra-cloud_pkg_proto.ClientUser'
+    type: object
+  pkg_api_handlers.DataRecognitionTaskListResponse:
+    properties:
+      page:
+        type: integer
+      page_size:
+        type: integer
+      results:
+        items:
+          $ref: '#/definitions/github_com_bazilio91_sferra-cloud_pkg_proto.DataRecognitionTask'
+        type: array
+      total_count:
+        type: integer
+    type: object
+  pkg_api_handlers.ErrorResponse:
     properties:
       error:
         type: string
     type: object
-  handlers.LoginInput:
+  pkg_api_handlers.LoginInput:
     properties:
       email:
         type: string
@@ -20,35 +241,55 @@ definitions:
     - email
     - password
     type: object
-  handlers.RegisterInput:
+  pkg_api_handlers.RegisterInput:
     properties:
+      clientID:
+        type: integer
       email:
         type: string
       password:
         minLength: 6
         type: string
     required:
+    - clientID
     - email
     - password
     type: object
-  handlers.SuccessResponse:
+  pkg_api_handlers.SuccessResponse:
     properties:
       message:
         type: string
     type: object
-  handlers.TokenResponse:
+  pkg_api_handlers.TokenResponse:
     properties:
       token:
         type: string
     type: object
-host: localhost:8080
+  timestamppb.Timestamp:
+    properties:
+      nanos:
+        description: |-
+          Non-negative fractions of a second at nanosecond resolution. Negative
+          second values with fractions must still have non-negative nanos values
+          that count forward in time. Must be from 0 to 999,999,999
+          inclusive.
+        type: integer
+      seconds:
+        description: |-
+          Represents seconds of UTC time since Unix epoch
+          1970-01-01T00:00:00Z. Must be from 0001-01-01T00:00:00Z to
+          9999-12-31T23:59:59Z inclusive.
+        type: integer
+    type: object
+  types.JSONValue:
+    properties:
+      value:
+        type: string
+    type: object
 info:
   contact: {}
-  description: This is the API documentation for Sferra Cloud.
-  title: Sferra Cloud API
-  version: "1.0"
 paths:
-  /account:
+  /api/v1/account:
     get:
       description: Get information about the current user
       produces:
@@ -57,21 +298,21 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/handlers.AccountInfoResponse'
+            $ref: '#/definitions/pkg_api_handlers.AccountInfoResponse'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/handlers.ErrorResponse'
+            $ref: '#/definitions/pkg_api_handlers.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/handlers.ErrorResponse'
+            $ref: '#/definitions/pkg_api_handlers.ErrorResponse'
       security:
       - BearerAuth: []
       summary: Get Account Info
       tags:
       - account
-  /auth/login:
+  /api/v1/auth/login:
     post:
       consumes:
       - application/json
@@ -82,26 +323,26 @@ paths:
         name: login
         required: true
         schema:
-          $ref: '#/definitions/handlers.LoginInput'
+          $ref: '#/definitions/pkg_api_handlers.LoginInput'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/handlers.TokenResponse'
+            $ref: '#/definitions/pkg_api_handlers.TokenResponse'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/handlers.ErrorResponse'
+            $ref: '#/definitions/pkg_api_handlers.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/handlers.ErrorResponse'
+            $ref: '#/definitions/pkg_api_handlers.ErrorResponse'
       summary: Login
       tags:
       - auth
-  /auth/register:
+  /api/v1/auth/register:
     post:
       consumes:
       - application/json
@@ -112,28 +353,241 @@ paths:
         name: register
         required: true
         schema:
-          $ref: '#/definitions/handlers.RegisterInput'
+          $ref: '#/definitions/pkg_api_handlers.RegisterInput'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/handlers.SuccessResponse'
+            $ref: '#/definitions/pkg_api_handlers.SuccessResponse'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/handlers.ErrorResponse'
+            $ref: '#/definitions/pkg_api_handlers.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/handlers.ErrorResponse'
+            $ref: '#/definitions/pkg_api_handlers.ErrorResponse'
       summary: Register
       tags:
       - auth
-securityDefinitions:
-  BearerAuth:
-    in: header
-    name: Authorization
-    type: apiKey
+  /api/v1/recognition_tasks:
+    get:
+      consumes:
+      - application/json
+      description: List DataRecognitionTasks for the authenticated client
+      parameters:
+      - description: Filter by status
+        in: query
+        name: status
+        type: string
+      - description: Page number
+        in: query
+        name: page
+        type: integer
+      - description: Page size
+        in: query
+        name: page_size
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/pkg_api_handlers.DataRecognitionTaskListResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/pkg_api_handlers.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/pkg_api_handlers.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: List DataRecognitionTask
+      tags:
+      - recognition_tasks
+    post:
+      consumes:
+      - application/json
+      description: Create a new DataRecognitionTask
+      parameters:
+      - description: DataRecognitionTask data
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_bazilio91_sferra-cloud_pkg_proto.DataRecognitionTask'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/github_com_bazilio91_sferra-cloud_pkg_proto.DataRecognitionTask'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/pkg_api_handlers.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/pkg_api_handlers.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Create DataRecognitionTask
+      tags:
+      - recognition_tasks
+  /api/v1/recognition_tasks/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete a DataRecognitionTask by ID
+      parameters:
+      - description: DataRecognitionTask ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/pkg_api_handlers.SuccessResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/pkg_api_handlers.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/pkg_api_handlers.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/pkg_api_handlers.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Delete DataRecognitionTask
+      tags:
+      - recognition_tasks
+    get:
+      consumes:
+      - application/json
+      description: Get a DataRecognitionTask by ID
+      parameters:
+      - description: DataRecognitionTask ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_bazilio91_sferra-cloud_pkg_proto.DataRecognitionTask'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/pkg_api_handlers.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/pkg_api_handlers.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/pkg_api_handlers.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Get DataRecognitionTask
+      tags:
+      - recognition_tasks
+    put:
+      consumes:
+      - application/json
+      description: Update a UpdateDataRecognitionTask by ID
+      parameters:
+      - description: UpdateDataRecognitionTask ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Updated DataRecognitionTask
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_bazilio91_sferra-cloud_pkg_proto.DataRecognitionTask'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_bazilio91_sferra-cloud_pkg_proto.DataRecognitionTask'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/pkg_api_handlers.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/pkg_api_handlers.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/pkg_api_handlers.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Update UpdateDataRecognitionTask
+      tags:
+      - recognition_tasks
+  /images/{id}:
+    get:
+      description: Get an image by ID
+      parameters:
+      - description: Image ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - image/jpeg
+      - image/png
+      - image/gif
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: file
+      summary: Get an image
+  /images/upload:
+    post:
+      consumes:
+      - multipart/form-data
+      description: Upload an image to storage
+      parameters:
+      - description: Image file
+        in: formData
+        name: image
+        required: true
+        type: file
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Upload an image
 swagger: "2.0"

@@ -1,0 +1,96 @@
+syntax = "proto3";
+
+package proto;
+
+option go_package = "./pkg/proto;proto";
+
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/any.proto";
+import "proto/data.proto";
+
+import "options/gorm.proto";
+import "types/types.proto";
+
+enum Status {
+  STATUS_CREATED = 0;
+  STATUS_READY_FOR_PROCESSING = 1;
+
+  // Image processing states
+  STATUS_IMAGES_PENDING = 2;
+  STATUS_IMAGES_PROCESSING = 3;
+  STATUS_IMAGES_COMPLETED = 4;
+  STATUS_IMAGES_FAILED_QUOTA = 5;
+  STATUS_IMAGES_FAILED_PROCESSING = 6;
+  STATUS_IMAGES_FAILED_TIMEOUT = 7;
+
+  // Recognition states
+  STATUS_RECOGNITION_PENDING = 8;
+  STATUS_RECOGNITION_PROCESSING = 9;
+  STATUS_RECOGNITION_COMPLETED = 10;
+  STATUS_RECOGNITION_FAILED_QUOTA = 11;
+  STATUS_RECOGNITION_FAILED_PROCESSING = 12;
+  STATUS_RECOGNITION_FAILED_TIMEOUT = 13;
+}
+
+message Client {
+  option (gorm.opts).ormable = true;
+
+  uint64 id = 1;
+  string name = 2;
+  int64 quota = 3;
+  int64 created_at = 4;
+  int64 updated_at = 5;
+  string owner_fio = 6;
+  int32 inn = 7;
+  int32 ogrn = 8;
+}
+
+message ClientUser {
+  option (gorm.opts).ormable = true;
+
+  uint64 id = 1;
+  uint64 client_id = 2;
+  string email = 3;
+  int64 created_at = 4;
+  int64 updated_at = 5;
+  string Password = 6;
+  string Username = 7;
+
+  Client client = 8;
+}
+
+message Admin {
+  option (gorm.opts).ormable = true;
+
+  uint64 id = 1;
+  string email = 2;
+  int64 created_at = 3;
+  int64 updated_at = 4;
+  string Password = 5;
+  string Username = 6;
+}
+
+message DataRecognitionTask {
+  option (gorm.opts) = {
+    ormable: true,
+    include: [
+      {type:"*datatypes.JSONType[TreeNode]", name:"result", package:"gorm.io/datatypes"}
+    ]
+  };
+
+  string id = 1  [(gorm.field).tag = {type: "uuid" primary_key: true}];
+  Client client = 2 [(gorm.field).belongs_to = {foreignkey: "client_id"}];
+  Status status = 3;
+  string error = 4;
+  string worker_id = 5;
+  string status_text = 6;
+
+  repeated string source_images = 10;
+  repeated string processed_images = 11;
+  optional TreeNode recognition_result = 12;
+  optional TreeNode frontend_result = 13;
+  optional gorm.types.JSONValue frontend_result_unrecognized = 14;
+
+  google.protobuf.Timestamp created_at = 20;
+  google.protobuf.Timestamp updated_at = 21;
+}

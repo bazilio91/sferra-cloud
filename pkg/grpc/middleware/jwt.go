@@ -13,12 +13,21 @@ import (
 
 // AuthInterceptor is a gRPC server interceptor for authentication
 type AuthInterceptor struct {
-	jwtManager *auth.JWTManager
+	jwtManager      *auth.JWTManager
+	allowedMethods  map[string]bool
 }
 
 // NewAuthInterceptor returns a new AuthInterceptor
-func NewAuthInterceptor(jwtManager *auth.JWTManager) *AuthInterceptor {
-	return &AuthInterceptor{jwtManager}
+func NewAuthInterceptor(jwtManager *auth.JWTManager, allowedMethods []string) *AuthInterceptor {
+	allowedMap := make(map[string]bool)
+	for _, method := range allowedMethods {
+		allowedMap[method] = true
+	}
+
+	return &AuthInterceptor{
+		jwtManager:     jwtManager,
+		allowedMethods: allowedMap,
+	}
 }
 
 // Unary returns a server interceptor function to authenticate unary RPC
@@ -29,45 +38,80 @@ func (interceptor *AuthInterceptor) Unary() grpc.UnaryServerInterceptor {
 		info *grpc.UnaryServerInfo,
 		handler grpc.UnaryHandler,
 	) (interface{}, error) {
-		return interceptor.authenticate(ctx, req, info, handler)
+		if !interceptor.allowedMethods[info.FullMethod] {
+			return handler(ctx, req)
+		}
+
+		claims, err := interceptor.authenticate(ctx)
+		if err != nil {
+			return nil, err
+		}
+
+		// Add claims to context
+		ctx = context.WithValue(ctx, auth.ContextKey("claims"), claims)
+		return handler(ctx, req)
+	}
+}
+
+// Stream returns a server interceptor function to authenticate stream RPC
+func (interceptor *AuthInterceptor) Stream() grpc.StreamServerInterceptor {
+	return func(
+		srv interface{},
+		stream grpc.ServerStream,
+		info *grpc.StreamServerInfo,
+		handler grpc.StreamHandler,
+	) error {
+		if !interceptor.allowedMethods[info.FullMethod] {
+			return handler(srv, stream)
+		}
+
+		claims, err := interceptor.authenticate(stream.Context())
+		if err != nil {
+			return err
+		}
+
+		// Wrap the stream to inject authenticated context
+		wrappedStream := &wrappedStream{
+			ServerStream: stream,
+			ctx:         context.WithValue(stream.Context(), auth.ContextKey("claims"), claims),
+		}
+		
+		return handler(srv, wrappedStream)
 	}
 }
 
 // authenticate checks the validity of the JWT token
-func (interceptor *AuthInterceptor) authenticate(
-	ctx context.Context,
-	req interface{},
-	info *grpc.UnaryServerInfo,
-	handler grpc.UnaryHandler,
-) (interface{}, error) {
-	// Skip authentication for health check
-	if info.FullMethod == "/pb.Health/Check" {
-		return handler(ctx, req)
-	}
-
+func (interceptor *AuthInterceptor) authenticate(ctx context.Context) (*auth.Claims, error) {
 	md, ok := metadata.FromIncomingContext(ctx)
 	if !ok {
-		return nil, status.Error(codes.Unauthenticated, "metadata is not provided")
+		return nil, status.Errorf(codes.Unauthenticated, "metadata is not provided")
 	}
 
-	authHeaders := md.Get("authorization")
-	if len(authHeaders) == 0 {
-		return nil, status.Error(codes.Unauthenticated, "authorization token is not provided")
+	values := md["authorization"]
+	if len(values) == 0 {
+		return nil, status.Errorf(codes.Unauthenticated, "authorization token is not provided")
 	}
 
-	authHeader := authHeaders[0]
-	parts := strings.SplitN(authHeader, " ", 2)
-	if len(parts) != 2 || parts[0] != "Bearer" {
-		return nil, status.Error(codes.Unauthenticated, "invalid authorization token format")
+	accessToken := values[0]
+	if !strings.HasPrefix(accessToken, "Bearer ") {
+		return nil, status.Error(codes.Unauthenticated, "invalid auth token format")
 	}
 
-	userID, err := interceptor.jwtManager.ValidateToken(parts[1])
+	tokenStr := strings.TrimPrefix(accessToken, "Bearer ")
+	claims, err := interceptor.jwtManager.VerifyJWT(tokenStr)
 	if err != nil {
-		return nil, status.Error(codes.Unauthenticated, "invalid token")
+		return nil, status.Errorf(codes.Unauthenticated, "access token is invalid: %v", err)
 	}
 
-	// Store userID in context if needed
-	ctx = context.WithValue(ctx, "userID", userID)
+	return claims, nil
+}
 
-	return handler(ctx, req)
+// wrappedStream wraps grpc.ServerStream to modify its context
+type wrappedStream struct {
+	grpc.ServerStream
+	ctx context.Context
+}
+
+func (w *wrappedStream) Context() context.Context {
+	return w.ctx
 }
