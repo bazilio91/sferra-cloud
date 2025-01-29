@@ -11,19 +11,20 @@ import (
 
 type UserFormInput struct {
 	Email    string `form:"email" binding:"required,email"`
-	Password string `form:"password" binding:"required,min=6"`
+	Username string `form:"username" binding:"required"`
+	Password string `form:"password" binding:"omitempty,min=6"`
 	ClientID uint64 `form:"client_id" binding:"required"`
 }
 
 func ListUsers(c *gin.Context) {
-	var users []proto.ClientUser
+	var users []proto.ClientUserORM
 
 	// GetTaskImage query parameters
 	emailFilter := c.Query("email")
 	clientNameFilter := c.Query("client_name")
 
 	// Build the query
-	query := db.DB.Preload("Client").Model(&proto.ClientUser{})
+	query := db.DB.Preload("Client").Model(&proto.ClientUserORM{})
 	if emailFilter != "" {
 		query = query.Where("client_users.email ILIKE ?", "%"+emailFilter+"%")
 	}
@@ -39,7 +40,7 @@ func ListUsers(c *gin.Context) {
 		return
 	}
 
-	c.HTML(http.StatusOK, "users.html", gin.H{
+	c.HTML(http.StatusOK, "user/users_list.html", gin.H{
 		"Users":            users,
 		"EmailFilter":      emailFilter,
 		"ClientNameFilter": clientNameFilter,
@@ -48,9 +49,9 @@ func ListUsers(c *gin.Context) {
 
 func NewUser(c *gin.Context) {
 	// Fetch clients for the client dropdown
-	var clients []proto.Client
+	var clients []proto.ClientORM
 	db.DB.Find(&clients)
-	c.HTML(http.StatusOK, "user_new.html", gin.H{
+	c.HTML(http.StatusOK, "user/user_new.html", gin.H{
 		"Clients":   clients,
 		"CsrfToken": csrf.GetToken(c),
 	})
@@ -60,9 +61,9 @@ func CreateUser(c *gin.Context) {
 	var input UserFormInput
 	if err := c.ShouldBind(&input); err != nil {
 		// Fetch clients to repopulate the form
-		var clients []proto.Client
+		var clients []proto.ClientORM
 		db.DB.Find(&clients)
-		c.HTML(http.StatusBadRequest, "user_new.html", gin.H{
+		c.HTML(http.StatusBadRequest, "user/user_new.html", gin.H{
 			"Error":     "Validation error: " + err.Error(),
 			"Clients":   clients,
 			"CsrfToken": csrf.GetToken(c),
@@ -72,7 +73,7 @@ func CreateUser(c *gin.Context) {
 
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(input.Password), bcrypt.DefaultCost)
 	if err != nil {
-		c.HTML(http.StatusBadRequest, "user_new.html", gin.H{
+		c.HTML(http.StatusBadRequest, "user/user_new.html", gin.H{
 			"Error":     "Failed to hash password",
 			"CsrfToken": csrf.GetToken(c),
 		})
@@ -81,12 +82,13 @@ func CreateUser(c *gin.Context) {
 
 	user := proto.ClientUser{
 		Email:    input.Email,
+		Username: input.Username,
 		Password: string(hashedPassword),
 		ClientId: input.ClientID,
 	}
 
 	if err := db.DB.Create(&user).Error; err != nil {
-		c.HTML(http.StatusBadRequest, "user_new.html", gin.H{
+		c.HTML(http.StatusBadRequest, "user/user_new.html", gin.H{
 			"Error":     "Failed to create user",
 			"CsrfToken": csrf.GetToken(c),
 		})
@@ -97,29 +99,29 @@ func CreateUser(c *gin.Context) {
 
 func ViewUser(c *gin.Context) {
 	id := c.Param("id")
-	var user proto.ClientUser
+	var user proto.ClientUserORM
 	if err := db.DB.Preload("Client").First(&user, id).Error; err != nil {
 		c.AbortWithStatus(http.StatusNotFound)
 		return
 	}
-	c.HTML(http.StatusOK, "user_view.html", gin.H{
+	c.HTML(http.StatusOK, "user/user_view.html", gin.H{
 		"User": user,
 	})
 }
 
 func EditUser(c *gin.Context) {
 	id := c.Param("id")
-	var user proto.ClientUser
+	var user proto.ClientUserORM
 	if err := db.DB.First(&user, id).Error; err != nil {
 		c.AbortWithStatus(http.StatusNotFound)
 		return
 	}
 
 	// Fetch clients for the client dropdown
-	var clients []proto.Client
+	var clients []proto.ClientORM
 	db.DB.Find(&clients)
 
-	c.HTML(http.StatusOK, "user_edit.html", gin.H{
+	c.HTML(http.StatusOK, "user/user_edit.html", gin.H{
 		"User":      user,
 		"Clients":   clients,
 		"CsrfToken": csrf.GetToken(c),
@@ -128,23 +130,18 @@ func EditUser(c *gin.Context) {
 
 func UpdateUser(c *gin.Context) {
 	id := c.Param("id")
-	var user proto.ClientUser
+	var user proto.ClientUserORM
 	if err := db.DB.First(&user, id).Error; err != nil {
 		c.AbortWithStatus(http.StatusNotFound)
 		return
 	}
 
-	var input struct {
-		Email    string `form:"email" binding:"required,email"`
-		Password string `form:"password" binding:"omitempty,min=6"`
-		ClientID uint64 `form:"client_id" binding:"required"`
-	}
-
+	var input UserFormInput
 	if err := c.ShouldBind(&input); err != nil {
 		// Fetch clients to repopulate the form
-		var clients []proto.Client
+		var clients []proto.ClientORM
 		db.DB.Find(&clients)
-		c.HTML(http.StatusBadRequest, "user_edit.html", gin.H{
+		c.HTML(http.StatusBadRequest, "user/user_edit.html", gin.H{
 			"Error":     "Validation error: " + err.Error(),
 			"User":      user,
 			"Clients":   clients,
@@ -154,18 +151,15 @@ func UpdateUser(c *gin.Context) {
 	}
 
 	user.Email = input.Email
+	user.Username = input.Username
 	user.ClientId = input.ClientID
 
 	if input.Password != "" {
-		var clients []proto.Client
-		db.DB.Find(&clients)
-
 		hashedPassword, err := bcrypt.GenerateFromPassword([]byte(input.Password), bcrypt.DefaultCost)
 		if err != nil {
-			c.HTML(http.StatusBadRequest, "user_edit.html", gin.H{
+			c.HTML(http.StatusBadRequest, "user/user_edit.html", gin.H{
 				"Error":     "Failed to hash password",
 				"User":      user,
-				"Clients":   clients,
 				"CsrfToken": csrf.GetToken(c),
 			})
 			return
@@ -174,13 +168,9 @@ func UpdateUser(c *gin.Context) {
 	}
 
 	if err := db.DB.Save(&user).Error; err != nil {
-		var clients []proto.Client
-		db.DB.Find(&clients)
-
-		c.HTML(http.StatusBadRequest, "user_edit.html", gin.H{
+		c.HTML(http.StatusBadRequest, "user/user_edit.html", gin.H{
 			"Error":     "Failed to update user",
 			"User":      user,
-			"Clients":   clients,
 			"CsrfToken": csrf.GetToken(c),
 		})
 		return
@@ -190,13 +180,13 @@ func UpdateUser(c *gin.Context) {
 
 func DeleteUser(c *gin.Context) {
 	id := c.Param("id")
-	var user proto.ClientUser
+	var user proto.ClientUserORM
 	if err := db.DB.First(&user, id).Error; err != nil {
 		c.AbortWithStatus(http.StatusNotFound)
 		return
 	}
 	if err := db.DB.Delete(&user).Error; err != nil {
-		c.HTML(http.StatusBadRequest, "users.html", gin.H{
+		c.HTML(http.StatusBadRequest, "user/users_list.html", gin.H{
 			"Error": "Failed to delete user",
 		})
 		return

@@ -12,8 +12,8 @@ func Dashboard(c *gin.Context) {
 	var clientCount int64
 	var userCount int64
 
-	db.DB.Model(&proto.Client{}).Count(&clientCount)
-	db.DB.Model(&proto.ClientUser{}).Count(&userCount)
+	db.DB.Model(&proto.ClientORM{}).Count(&clientCount)
+	db.DB.Model(&proto.ClientUserORM{}).Count(&userCount)
 
 	c.HTML(http.StatusOK, "dashboard.html", gin.H{
 		"ClientCount": clientCount,

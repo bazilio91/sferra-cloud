@@ -19,9 +19,9 @@ type ClientORM struct {
 	ClientUserId *uint64
 	CreatedAt    int64
 	Id           uint64
-	Inn          int32
+	Inn          string
 	Name         string
-	Ogrn         int32
+	Ogrn         string
 	OwnerFio     string
 	Quota        int64
 	UpdatedAt    int64

@@ -1,10 +1,7 @@
 package admin
 
 import (
-	"github.com/bazilio91/sferra-cloud/pkg/proto"
-	"golang.org/x/crypto/bcrypt"
 	"html/template"
-	"log"
 	"path/filepath"
 	"time"
 
@@ -30,7 +27,7 @@ func RunAdminServer() error {
 	}
 
 	// Initialize default admin user
-	if err := initAdminUser(); err != nil {
+	if err := seed(); err != nil {
 		return err
 	}
 
@@ -108,10 +105,18 @@ func createRenderer() multitemplate.Renderer {
 	if err != nil {
 		panic(err.Error())
 	}
+	// Parse templates for subfolders
+	subfolders, err := filepath.Glob("templates/pages/**/*.html")
+	if err != nil {
+		panic(err.Error())
+	}
 
-	for _, page := range pages {
+	for _, page := range append(pages, subfolders...) {
 		// Create template name from file name
-		tmplName := filepath.Base(page)
+		tmplName, err := filepath.Rel("templates/pages/", page)
+		if err != nil {
+			panic(err.Error())
+		}
 		// Combine base layout, includes, and page template
 		templates := append([]string{page}, includes...)
 		templates = append(templates, layout)
@@ -125,25 +130,4 @@ func createRenderer() multitemplate.Renderer {
 	}
 
 	return r
-}
-
-func initAdminUser() error {
-	var count int64
-	db.DB.Model(&proto.Admin{}).Count(&count)
-	if count == 0 {
-		// Create a default admin user
-		hashedPassword, err := bcrypt.GenerateFromPassword([]byte("admin123"), bcrypt.DefaultCost)
-		if err != nil {
-			return err
-		}
-		admin := proto.Admin{
-			Username: "admin",
-			Password: string(hashedPassword),
-		}
-		if err := db.DB.Create(&admin).Error; err != nil {
-			return err
-		}
-		log.Println("Default admin user created with username 'admin' and password 'admin123'")
-	}
-	return nil
 }

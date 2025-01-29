@@ -6,7 +6,7 @@
         {{ .Error }}
     </div>
     {{ end }}
-    <form method="POST" action="/clients/{{ .Client.ID }}">
+    <form method="POST" action="/clients/{{ .Client.Id }}">
         <div class="mb-4">
             <label for="name" class="block text-gray-700">Name</label>
             <input type="text" name="name" id="name" class="border border-gray-300 p-2 w-full" value="{{ .Client.Name }}" required>
@@ -14,6 +14,18 @@
         <div class="mb-4">
             <label for="quota" class="block text-gray-700">Quota</label>
             <input type="number" name="quota" id="quota" class="border border-gray-300 p-2 w-full" value="{{ .Client.Quota }}" required>
+        </div>
+        <div class="mb-4">
+            <label for="owner_fio" class="block text-gray-700">Owner Full Name</label>
+            <input type="text" name="owner_fio" id="owner_fio" class="border border-gray-300 p-2 w-full" value="{{ .Client.OwnerFio }}" required>
+        </div>
+        <div class="mb-4">
+            <label for="inn" class="block text-gray-700">INN</label>
+            <input type="text" name="inn" id="inn" class="border border-gray-300 p-2 w-full" value="{{ .Client.Inn }}" required>
+        </div>
+        <div class="mb-4">
+            <label for="ogrn" class="block text-gray-700">OGRN</label>
+            <input type="text" name="ogrn" id="ogrn" class="border border-gray-300 p-2 w-full" value="{{ .Client.Ogrn }}" required>
         </div>
         <button type="submit" class="bg-blue-500 text-white px-4 py-2">Update</button>
     </form>
