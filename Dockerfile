@@ -12,13 +12,14 @@ WORKDIR /app
 COPY go.mod go.sum ./
 RUN go mod download
 COPY . .
+COPY --from=frontend-builder /app/static/css/styles.css ./static/css/
 RUN CGO_ENABLED=0 GOOS=linux go build -o /app/main ./cmd/
 
 FROM alpine:3.19
 WORKDIR /app
 COPY --from=builder /app/main /app/
 COPY --from=builder /app/templates /app/templates
-COPY --from=frontend-builder /app/static ./app/static
+COPY --from=builder /app/static /app/static
 COPY --from=builder /app/.env.example /app/.env
 
 EXPOSE 8080
