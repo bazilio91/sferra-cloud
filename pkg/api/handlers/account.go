@@ -30,6 +30,8 @@ func GetAccountInfo(c *gin.Context) {
 		return
 	}
 
+	user.Password = ""
+
 	c.JSON(http.StatusOK, AccountInfoResponse{
 		User: user,
 	})

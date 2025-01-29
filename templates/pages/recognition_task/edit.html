@@ -1,0 +1,74 @@
+{{ define "content" }}
+<div class="container mx-auto p-6">
+    <div class="max-w-lg mx-auto">
+        <h1 class="text-2xl font-bold mb-6">Edit Recognition Task</h1>
+
+        {{ if .Error }}
+        <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4" role="alert">
+            <span class="block sm:inline">{{ .Error }}</span>
+        </div>
+        {{ end }}
+
+        <div class="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4">
+            <div class="mb-4">
+                <label class="block text-gray-700 text-sm font-bold mb-2">
+                    ID
+                </label>
+                <p class="text-gray-600">{{ .Task.Id }}</p>
+            </div>
+
+            <div class="mb-4">
+                <label class="block text-gray-700 text-sm font-bold mb-2">
+                    Client
+                </label>
+                <p class="text-gray-600">{{ .Task.Client.Name }}</p>
+            </div>
+
+            <form action="/recognition-tasks/{{ .Task.Id }}" method="POST">
+                <div class="mb-4">
+                    <label class="block text-gray-700 text-sm font-bold mb-2" for="status">
+                        Status
+                    </label>
+                    <select class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                            id="status" name="status">
+                        {{ range .Statuses }}
+                        <option value="{{ .Value }}" {{ if eq .Value $.Task.Status }}selected{{ end }}>
+                            {{ .Label }}
+                        </option>
+                        {{ end }}
+                    </select>
+                </div>
+
+                <div class="mb-4">
+                    <label class="block text-gray-700 text-sm font-bold mb-2">
+                        Created At
+                    </label>
+                    <p class="text-gray-600">{{ .Task.CreatedAt.Format "2006-01-02 15:04:05" }}</p>
+                </div>
+
+                <div class="mb-4">
+                    <label class="block text-gray-700 text-sm font-bold mb-2">
+                        Updated At
+                    </label>
+                    <p class="text-gray-600">{{ .Task.UpdatedAt.Format "2006-01-02 15:04:05" }}</p>
+                </div>
+
+                {{ template "csrf" . }}
+
+                <div class="flex items-center justify-between">
+                    <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+                            type="submit">
+                        Update Task
+                    </button>
+                    <a href="/recognition-tasks"
+                       class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
+                        Cancel
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{{ end }}
+
+{{ template "layout" . }}

@@ -74,11 +74,12 @@ message DataRecognitionTask {
   option (gorm.opts) = {
     ormable: true,
     include: [
-      {type:"*datatypes.JSONType[TreeNode]", name:"result", package:"gorm.io/datatypes"}
+      {type:"*datatypes.JSONType[TreeNode]", name:"recognition_result", package:"gorm.io/datatypes"},
+      {type:"*datatypes.JSONType[TreeNode]", name:"frontend_result", package:"gorm.io/datatypes"}
     ]
   };
 
-  string id = 1  [(gorm.field).tag = {type: "uuid" primary_key: true}];
+  string id = 1 [(gorm.field).tag = {type: "uuid" primary_key: true, default: "uuid_generate_v4()"}];
   Client client = 2 [(gorm.field).belongs_to = {foreignkey: "client_id"}];
   Status status = 3;
   string error = 4;

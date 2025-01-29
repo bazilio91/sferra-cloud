@@ -288,10 +288,11 @@ type DataRecognitionTaskORM struct {
 	ClientId                   *uint64
 	CreatedAt                  *time.Time
 	Error                      string
+	FrontendResult             *datatypes.JSONType[TreeNode]
 	FrontendResultUnrecognized *types.Jsonb   `gorm:"type:jsonb"`
-	Id                         string         `gorm:"type:uuid;primaryKey"`
+	Id                         string         `gorm:"type:uuid;primaryKey;default:uuid_generate_v4()"`
 	ProcessedImages            pq.StringArray `gorm:"type:text[]"`
-	Result                     *datatypes.JSONType[TreeNode]
+	RecognitionResult          *datatypes.JSONType[TreeNode]
 	SourceImages               pq.StringArray `gorm:"type:text[]"`
 	Status                     int32
 	StatusText                 string

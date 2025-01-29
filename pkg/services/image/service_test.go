@@ -51,8 +51,8 @@ func TestImageService_Upload(t *testing.T) {
 	service, _, cleanup := setupTest(t)
 	defer cleanup()
 
-	clientID := uint(1)
-	taskID := uint(123)
+	clientID := uint64(1)
+	taskID := "123"
 	filename := "test.jpg"
 	content := []byte("test image data")
 
@@ -67,7 +67,7 @@ func TestImageService_Get(t *testing.T) {
 	defer cleanup()
 
 	ctx := context.Background()
-	clientID := uint(1)
+	clientID := uint64(1)
 	taskID := "123"
 	filename := "test.jpg"
 	content := []byte("test image data")

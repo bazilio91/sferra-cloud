@@ -29,11 +29,11 @@ definitions:
       id:
         type: integer
       inn:
-        type: integer
+        type: string
       name:
         type: string
       ogrn:
-        type: integer
+        type: string
       owner_fio:
         type: string
       quota:
@@ -86,8 +86,12 @@ definitions:
         type: array
       status:
         $ref: '#/definitions/github_com_bazilio91_sferra-cloud_pkg_proto.Status'
+      status_text:
+        type: string
       updated_at:
         $ref: '#/definitions/timestamppb.Timestamp'
+      worker_id:
+        type: string
     type: object
   github_com_bazilio91_sferra-cloud_pkg_proto.FieldStatus:
     enum:
@@ -170,9 +174,11 @@ definitions:
     - 10
     - 11
     - 12
+    - 13
     type: integer
     x-enum-varnames:
-    - Status_STATUS_UNKNOWN
+    - Status_STATUS_CREATED
+    - Status_STATUS_READY_FOR_PROCESSING
     - Status_STATUS_IMAGES_PENDING
     - Status_STATUS_IMAGES_PROCESSING
     - Status_STATUS_IMAGES_COMPLETED
@@ -291,7 +297,7 @@ info:
 paths:
   /api/v1/account:
     get:
-      description: Get information about the current user
+      description: GetTaskImage information about the current user
       produces:
       - application/json
       responses:
@@ -309,7 +315,7 @@ paths:
             $ref: '#/definitions/pkg_api_handlers.ErrorResponse'
       security:
       - BearerAuth: []
-      summary: Get Account Info
+      summary: GetTaskImage Account Info
       tags:
       - account
   /api/v1/auth/login:
@@ -479,7 +485,7 @@ paths:
     get:
       consumes:
       - application/json
-      description: Get a DataRecognitionTask by ID
+      description: GetTaskImage a DataRecognitionTask by ID
       parameters:
       - description: DataRecognitionTask ID
         in: path
@@ -507,7 +513,7 @@ paths:
             $ref: '#/definitions/pkg_api_handlers.ErrorResponse'
       security:
       - BearerAuth: []
-      summary: Get DataRecognitionTask
+      summary: GetTaskImage DataRecognitionTask
       tags:
       - recognition_tasks
     put:
@@ -550,13 +556,18 @@ paths:
       summary: Update UpdateDataRecognitionTask
       tags:
       - recognition_tasks
-  /images/{id}:
+  /recognition-tasks/{task_id}/images/{image_id}:
     get:
-      description: Get an image by ID
+      description: GetTaskImage an image by ID
       parameters:
+      - description: Recognition Task ID
+        in: path
+        name: task_id
+        required: true
+        type: integer
       - description: Image ID
         in: path
-        name: id
+        name: image_id
         required: true
         type: string
       produces:
@@ -568,13 +579,18 @@ paths:
           description: OK
           schema:
             type: file
-      summary: Get an image
-  /images/upload:
+      summary: GetTaskImage an image
+  /recognition-tasks/{task_id}/images/upload:
     post:
       consumes:
       - multipart/form-data
-      description: Upload an image to storage
+      description: UploadTaskImage an image to storage
       parameters:
+      - description: Recognition Task ID
+        in: path
+        name: task_id
+        required: true
+        type: integer
       - description: Image file
         in: formData
         name: image
@@ -589,5 +605,5 @@ paths:
             additionalProperties:
               type: string
             type: object
-      summary: Upload an image
+      summary: UploadTaskImage an image
 swagger: "2.0"

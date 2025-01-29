@@ -6,7 +6,6 @@ import (
 	"github.com/bazilio91/sferra-cloud/pkg/services/storage"
 	"net/http"
 	"net/url"
-	"strconv"
 	"strings"
 
 	"github.com/bazilio91/sferra-cloud/pkg/auth"
@@ -24,7 +23,7 @@ func NewImageHandler(s3Client *storage.S3Client) *ImageHandler {
 }
 
 // getClientIDFromContext extracts client ID from the JWT claims
-func getClientIDFromContext(c *gin.Context) (uint, error) {
+func getClientIDFromContext(c *gin.Context) (uint64, error) {
 	userValue, exists := c.Get("user")
 	if !exists {
 		return 0, fmt.Errorf("user not found in context")
@@ -35,7 +34,7 @@ func getClientIDFromContext(c *gin.Context) (uint, error) {
 		return 0, fmt.Errorf("invalid user claims type")
 	}
 
-	return uint(claims.ClientID), nil
+	return claims.ClientID, nil
 }
 
 // UploadImage godoc
@@ -55,8 +54,8 @@ func (h *ImageHandler) UploadImage(c *gin.Context) {
 	}
 
 	// GetTaskImage task ID from path
-	taskID, err := strconv.ParseUint(c.Param("task_id"), 10, 64)
-	if err != nil {
+	taskID := c.Param("task_id")
+	if taskID == "" {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid task ID"})
 		return
 	}
@@ -75,7 +74,7 @@ func (h *ImageHandler) UploadImage(c *gin.Context) {
 	}
 	defer src.Close()
 
-	result, err := h.imageService.UploadTaskImage(c.Request.Context(), clientID, uint(taskID), file.Filename, src)
+	result, err := h.imageService.UploadTaskImage(c.Request.Context(), clientID, taskID, file.Filename, src)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to upload file"})
 		return

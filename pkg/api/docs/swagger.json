@@ -11,14 +11,14 @@
                         "BearerAuth": []
                     }
                 ],
-                "description": "Get information about the current user",
+                "description": "GetTaskImage information about the current user",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
                     "account"
                 ],
-                "summary": "Get Account Info",
+                "summary": "GetTaskImage Account Info",
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -249,7 +249,7 @@
                         "BearerAuth": []
                     }
                 ],
-                "description": "Get a DataRecognitionTask by ID",
+                "description": "GetTaskImage a DataRecognitionTask by ID",
                 "consumes": [
                     "application/json"
                 ],
@@ -259,7 +259,7 @@
                 "tags": [
                     "recognition_tasks"
                 ],
-                "summary": "Get DataRecognitionTask",
+                "summary": "GetTaskImage DataRecognitionTask",
                 "parameters": [
                     {
                         "type": "string",
@@ -412,17 +412,24 @@
                 }
             }
         },
-        "/images/upload": {
+        "/recognition-tasks/{task_id}/images/upload": {
             "post": {
-                "description": "Upload an image to storage",
+                "description": "UploadTaskImage an image to storage",
                 "consumes": [
                     "multipart/form-data"
                 ],
                 "produces": [
                     "application/json"
                 ],
-                "summary": "Upload an image",
+                "summary": "UploadTaskImage an image",
                 "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Recognition Task ID",
+                        "name": "task_id",
+                        "in": "path",
+                        "required": true
+                    },
                     {
                         "type": "file",
                         "description": "Image file",
@@ -444,20 +451,27 @@
                 }
             }
         },
-        "/images/{id}": {
+        "/recognition-tasks/{task_id}/images/{image_id}": {
             "get": {
-                "description": "Get an image by ID",
+                "description": "GetTaskImage an image by ID",
                 "produces": [
                     "image/jpeg",
                     "image/png",
                     "image/gif"
                 ],
-                "summary": "Get an image",
+                "summary": "GetTaskImage an image",
                 "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Recognition Task ID",
+                        "name": "task_id",
+                        "in": "path",
+                        "required": true
+                    },
                     {
                         "type": "string",
                         "description": "Image ID",
-                        "name": "id",
+                        "name": "image_id",
                         "in": "path",
                         "required": true
                     }
@@ -519,13 +533,13 @@
                     "type": "integer"
                 },
                 "inn": {
-                    "type": "integer"
+                    "type": "string"
                 },
                 "name": {
                     "type": "string"
                 },
                 "ogrn": {
-                    "type": "integer"
+                    "type": "string"
                 },
                 "owner_fio": {
                     "type": "string"
@@ -606,8 +620,14 @@
                 "status": {
                     "$ref": "#/definitions/github_com_bazilio91_sferra-cloud_pkg_proto.Status"
                 },
+                "status_text": {
+                    "type": "string"
+                },
                 "updated_at": {
                     "$ref": "#/definitions/timestamppb.Timestamp"
+                },
+                "worker_id": {
+                    "type": "string"
                 }
             }
         },
@@ -724,10 +744,12 @@
                 9,
                 10,
                 11,
-                12
+                12,
+                13
             ],
             "x-enum-varnames": [
-                "Status_STATUS_UNKNOWN",
+                "Status_STATUS_CREATED",
+                "Status_STATUS_READY_FOR_PROCESSING",
                 "Status_STATUS_IMAGES_PENDING",
                 "Status_STATUS_IMAGES_PROCESSING",
                 "Status_STATUS_IMAGES_COMPLETED",

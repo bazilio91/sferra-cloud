@@ -1,6 +1,7 @@
 package admin
 
 import (
+	"github.com/bazilio91/sferra-cloud/pkg/services/storage"
 	"html/template"
 	"path/filepath"
 	"time"
@@ -27,7 +28,7 @@ func RunAdminServer() error {
 	}
 
 	// Initialize default admin user
-	if err := seed(); err != nil {
+	if err := seed(storage.NewS3Client(cfg)); err != nil {
 		return err
 	}
 
@@ -53,21 +54,25 @@ func RunAdminServer() error {
 	// Static files
 	r.Static("/static", "./static")
 
-	// Initialize default admin user
-	if err := initAdminUser(); err != nil {
-		return err
-	}
-
 	// Set up routes
-	r.GET("/login", ShowLoginPage)
-	r.POST("/login", PerformLogin)
-	r.GET("/logout", PerformLogout)
+	setupRoutes(r)
+
+	// Start the server
+	return r.Run(":" + cfg.AdminServerPort)
+}
+
+func setupRoutes(router *gin.Engine) {
+	router.GET("/login", ShowLoginPage)
+	router.POST("/login", PerformLogin)
 
 	// Protected routes
-	authorized := r.Group("/")
+	authorized := router.Group("/")
 	authorized.Use(AuthRequired)
 	{
 		authorized.GET("/", Dashboard)
+		authorized.GET("/logout", PerformLogout)
+
+		// Client routes
 		authorized.GET("/clients", ListClients)
 		authorized.GET("/clients/new", NewClient)
 		authorized.POST("/clients", CreateClient)
@@ -76,17 +81,19 @@ func RunAdminServer() error {
 		authorized.POST("/clients/:id", UpdateClient)
 		authorized.POST("/clients/:id/delete", DeleteClient)
 
+		// User routes
 		authorized.GET("/users", ListUsers)
 		authorized.GET("/users/new", NewUser)
 		authorized.POST("/users", CreateUser)
-		authorized.GET("/users/:id", ViewUser)
 		authorized.GET("/users/:id/edit", EditUser)
 		authorized.POST("/users/:id", UpdateUser)
 		authorized.POST("/users/:id/delete", DeleteUser)
-	}
 
-	// Start the server
-	return r.Run(":" + cfg.AdminServerPort)
+		// Recognition Task routes
+		authorized.GET("/recognition-tasks", ListRecognitionTasks)
+		authorized.GET("/recognition-tasks/:id/edit", EditRecognitionTask)
+		authorized.POST("/recognition-tasks/:id", UpdateRecognitionTask)
+	}
 }
 
 // Provided createRenderer function

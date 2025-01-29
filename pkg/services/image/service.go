@@ -28,9 +28,9 @@ type UploadResult struct {
 }
 
 // UploadTaskImage handles image upload with metadata
-func (s *Service) UploadTaskImage(ctx context.Context, clientID uint, taskID uint, filename string, reader io.Reader) (*UploadResult, error) {
+func (s *Service) UploadTaskImage(ctx context.Context, clientID uint64, taskID string, filename string, reader io.Reader) (*UploadResult, error) {
 	// Generate a unique key for the image using client ID, task ID and original filename
-	key := fmt.Sprintf("images/%d/%d/%s", clientID, taskID, filename)
+	key := fmt.Sprintf("images/%d/%s/%s", clientID, taskID, filename)
 
 	// UploadTaskImage to S3
 	if err := s.s3Client.UploadImage(ctx, key, reader); err != nil {
@@ -56,7 +56,7 @@ type GetResult struct {
 }
 
 // GetTaskImage retrieves an image and verifies ownership using path
-func (s *Service) GetTaskImage(ctx context.Context, clientID uint, taskID string, imageID string) (*GetResult, error) {
+func (s *Service) GetTaskImage(ctx context.Context, clientID uint64, taskID string, imageID string) (*GetResult, error) {
 	imagePath := fmt.Sprintf("images/%d/%s/%s", clientID, taskID, imageID)
 	content, contentType, err := s.s3Client.GetObject(ctx, imagePath)
 	if err != nil {

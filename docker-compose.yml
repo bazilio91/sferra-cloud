@@ -26,10 +26,21 @@ services:
     volumes:
       - minio_data:/data
     healthcheck:
-      test: ["CMD", "mc", "ready", "local"]
+      test: [ "CMD", "mc", "ready", "local" ]
       interval: 5s
       timeout: 5s
       retries: 5
+
+  createbuckets:
+    image: minio/mc:latest
+    depends_on:
+      - minio
+    entrypoint: >
+      /bin/sh -c "
+      /usr/bin/mc alias set myminio http://minio:9000 ${MINIO_ROOT_USER:-sferra_minio} ${MINIO_ROOT_PASSWORD:-sferra_minio_password};
+      /usr/bin/mc mb myminio/${S3_BUCKET};
+      exit 0;
+      "
 
 volumes:
   db_data:

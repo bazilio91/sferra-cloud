@@ -41,6 +41,11 @@ func InitDBWithDSN(dsn string) error {
 		return fmt.Errorf("failed to connect to database: %w", err)
 	}
 
+	err = DB.Exec("CREATE EXTENSION IF NOT EXISTS \"uuid-ossp\";").Error
+	if err != nil {
+		return fmt.Errorf("failed to create uuid-ossp extension: %w", err)
+	}
+
 	// Enable logging in debug mode
 	if os.Getenv("DEBUG") != "" {
 		DB = DB.Debug()

@@ -423,7 +423,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/images/upload": {
+        "/recognition-tasks/{task_id}/images/upload": {
             "post": {
                 "description": "UploadTaskImage an image to storage",
                 "consumes": [
@@ -434,6 +434,13 @@ const docTemplate = `{
                 ],
                 "summary": "UploadTaskImage an image",
                 "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Recognition Task ID",
+                        "name": "task_id",
+                        "in": "path",
+                        "required": true
+                    },
                     {
                         "type": "file",
                         "description": "Image file",
@@ -455,7 +462,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/images/{id}": {
+        "/recognition-tasks/{task_id}/images/{image_id}": {
             "get": {
                 "description": "GetTaskImage an image by ID",
                 "produces": [
@@ -466,9 +473,16 @@ const docTemplate = `{
                 "summary": "GetTaskImage an image",
                 "parameters": [
                     {
+                        "type": "integer",
+                        "description": "Recognition Task ID",
+                        "name": "task_id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
                         "type": "string",
                         "description": "Image ID",
-                        "name": "id",
+                        "name": "image_id",
                         "in": "path",
                         "required": true
                     }
@@ -530,13 +544,13 @@ const docTemplate = `{
                     "type": "integer"
                 },
                 "inn": {
-                    "type": "integer"
+                    "type": "string"
                 },
                 "name": {
                     "type": "string"
                 },
                 "ogrn": {
-                    "type": "integer"
+                    "type": "string"
                 },
                 "owner_fio": {
                     "type": "string"
@@ -617,8 +631,14 @@ const docTemplate = `{
                 "status": {
                     "$ref": "#/definitions/github_com_bazilio91_sferra-cloud_pkg_proto.Status"
                 },
+                "status_text": {
+                    "type": "string"
+                },
                 "updated_at": {
                     "$ref": "#/definitions/timestamppb.Timestamp"
+                },
+                "worker_id": {
+                    "type": "string"
                 }
             }
         },
@@ -735,10 +755,12 @@ const docTemplate = `{
                 9,
                 10,
                 11,
-                12
+                12,
+                13
             ],
             "x-enum-varnames": [
-                "Status_STATUS_UNKNOWN",
+                "Status_STATUS_CREATED",
+                "Status_STATUS_READY_FOR_PROCESSING",
                 "Status_STATUS_IMAGES_PENDING",
                 "Status_STATUS_IMAGES_PROCESSING",
                 "Status_STATUS_IMAGES_COMPLETED",

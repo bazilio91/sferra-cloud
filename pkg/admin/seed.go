@@ -1,19 +1,23 @@
 package admin
 
 import (
+	"context"
 	"github.com/bazilio91/sferra-cloud/pkg/db"
 	"github.com/bazilio91/sferra-cloud/pkg/proto"
+	"github.com/bazilio91/sferra-cloud/pkg/services/image"
+	"github.com/bazilio91/sferra-cloud/pkg/services/storage"
 	"golang.org/x/crypto/bcrypt"
 	"log"
 	"os"
+	"path"
 )
 
-func seed() error {
+func seed(s3Client *storage.S3Client) error {
 	if err := initAdminUser(); err != nil {
 		return err
 	}
 
-	if err := seedClient(); err != nil {
+	if err := seedClient(s3Client); err != nil {
 		return err
 	}
 
@@ -41,7 +45,7 @@ func initAdminUser() error {
 	return nil
 }
 
-func seedClient() error {
+func seedClient(s3client *storage.S3Client) error {
 	// check if client id = 1 exists
 	var client proto.ClientORM
 	err := db.DB.First(&client, 1).Error
@@ -81,6 +85,45 @@ func seedClient() error {
 	}
 
 	log.Printf("User for default client created\n")
+
+	task := &proto.DataRecognitionTaskORM{
+		ClientId:                   &client.Id,
+		FrontendResult:             nil,
+		FrontendResultUnrecognized: nil,
+		ProcessedImages:            nil,
+		RecognitionResult:          nil,
+		SourceImages:               nil,
+		Status:                     0,
+	}
+	// create example recognition task
+	err = db.DB.Create(&task).Error
+
+	if err != nil {
+		return err
+	}
+
+	// now lets upload some images
+	imagePaths := []string{"0-4851.07  Љаоз®Є.jpeg", "016.72.281.jpeg"}
+	imageService := image.NewService(s3client)
+
+	for _, imagePath := range imagePaths {
+		imageF, err := os.Open(path.Join("static", "test_data", imagePath))
+		if err != nil {
+			return err
+		}
+
+		taskImage, err := imageService.UploadTaskImage(context.Background(), client.Id, task.Id, imagePath, imageF)
+		if err != nil {
+			return err
+		}
+
+		task.SourceImages = append(task.SourceImages, taskImage.ID)
+	}
+
+	err = db.DB.Save(&task).Error
+	if err != nil {
+		return err
+	}
 
 	return nil
 }

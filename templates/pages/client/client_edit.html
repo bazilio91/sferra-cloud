@@ -27,6 +27,7 @@
             <label for="ogrn" class="block text-gray-700">OGRN</label>
             <input type="text" name="ogrn" id="ogrn" class="border border-gray-300 p-2 w-full" value="{{ .Client.Ogrn }}" required>
         </div>
+        {{ template "csrf" . }}
         <button type="submit" class="bg-blue-500 text-white px-4 py-2">Update</button>
     </form>
 </div>
