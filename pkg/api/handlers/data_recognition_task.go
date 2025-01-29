@@ -258,7 +258,7 @@ func DeleteDataRecognitionTask(c *gin.Context) {
 // @Failure 401 {object} ErrorResponse
 // @Router /api/v1/recognition_tasks [get]
 func ListDataRecognitionTask(c *gin.Context) {
-	userClaims := c.MustGet("user").(*auth.Claims)
+	userClaims := c.MustGet("claims").(*auth.Claims)
 
 	page, _ := strconv.Atoi(c.DefaultQuery("page", "1"))
 	pageSize, _ := strconv.Atoi(c.DefaultQuery("page_size", "10"))
@@ -266,7 +266,7 @@ func ListDataRecognitionTask(c *gin.Context) {
 
 	query := db.DB.Model(&proto.DataRecognitionTaskORM{}).
 		Joins("JOIN clients ON clients.id = data_recognition_tasks.client_id").
-		Where("clients.id = ?", uint64(userClaims.ClientID))
+		Where("clients.id = ?", userClaims.ClientID)
 
 	if status != "" {
 		query = query.Where("data_recognition_tasks.status = ?", status)

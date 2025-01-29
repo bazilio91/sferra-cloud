@@ -52,7 +52,7 @@ func setupImageTest(t *testing.T) (*gin.Engine, *storage.S3Client, func()) {
 			UserID:   1,
 			ClientID: 1,
 		}
-		c.Set("user", claims)
+		c.Set("claims", claims)
 		c.Next()
 	}
 

@@ -178,7 +178,7 @@ var _ = Describe("DataRecognitionTask", func() {
 			w := httptest.NewRecorder()
 			c, _ := gin.CreateTestContext(w)
 			c.Request, _ = http.NewRequest(http.MethodGet, "/api/v1/recognition_requests", nil)
-			c.Set("user", claims)
+			c.Set("claims", claims)
 
 			handlers.ListDataRecognitionTask(c)
 

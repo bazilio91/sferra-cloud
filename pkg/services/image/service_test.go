@@ -58,7 +58,7 @@ func TestImageService_Upload(t *testing.T) {
 
 	result, err := service.UploadTaskImage(context.Background(), clientID, taskID, filename, bytes.NewReader(content))
 	require.NoError(t, err)
-	assert.Equal(t, fmt.Sprintf("images/%d/%d/%s", clientID, taskID, filename), result.ID)
+	assert.Equal(t, fmt.Sprintf("images/%d/%s/%s", clientID, taskID, filename), result.ID)
 	assert.Contains(t, result.URL, filename)
 }
 

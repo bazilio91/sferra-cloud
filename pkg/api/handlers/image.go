@@ -24,7 +24,7 @@ func NewImageHandler(s3Client *storage.S3Client) *ImageHandler {
 
 // getClientIDFromContext extracts client ID from the JWT claims
 func getClientIDFromContext(c *gin.Context) (uint64, error) {
-	userValue, exists := c.Get("user")
+	userValue, exists := c.Get("claims")
 	if !exists {
 		return 0, fmt.Errorf("user not found in context")
 	}

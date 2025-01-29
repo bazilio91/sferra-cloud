@@ -127,7 +127,7 @@ func (s *TaskService) FinishTask(ctx context.Context, req *proto.FinishTaskReque
 	case proto.Status_STATUS_RECOGNITION_PROCESSING:
 		taskOrm.Status = int32(proto.Status_STATUS_RECOGNITION_COMPLETED)
 		result := datatypes.NewJSONType[proto.TreeNode](*req.RecognitionResult)
-		taskOrm.Result = &result
+		taskOrm.RecognitionResult = &result
 	}
 
 	if err := s.db.Save(&taskOrm).Error; err != nil {
