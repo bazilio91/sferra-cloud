@@ -9,11 +9,12 @@ import (
 )
 
 type ClientFormInput struct {
-	Name     string `form:"name" binding:"required,min=3,max=100"`
-	Quota    int64  `form:"quota" binding:"required,gte=0"`
-	OwnerFio string `form:"owner_fio" binding:"required"`
-	Inn      string `form:"inn" binding:"required"`
-	Ogrn     string `form:"ogrn" binding:"required"`
+	Name       string `form:"name" binding:"required,min=3,max=100"`
+	Quota      int64  `form:"quota" binding:"required,gte=0"`
+	TotalQuota int64  `form:"total_quota" binding:"required,gte=0"`
+	OwnerFio   string `form:"owner_fio" binding:"required"`
+	Inn        string `form:"inn" binding:"required"`
+	Ogrn       string `form:"ogrn" binding:"required"`
 }
 
 func ListClients(c *gin.Context) {
@@ -64,11 +65,12 @@ func CreateClient(c *gin.Context) {
 	}
 
 	client := proto.ClientORM{
-		Name:     input.Name,
-		Quota:    input.Quota,
-		OwnerFio: input.OwnerFio,
-		Inn:      input.Inn,
-		Ogrn:     input.Ogrn,
+		Name:       input.Name,
+		Quota:      input.Quota,
+		TotalQuota: input.TotalQuota,
+		OwnerFio:   input.OwnerFio,
+		Inn:        input.Inn,
+		Ogrn:       input.Ogrn,
 	}
 	if err := db.DB.Create(&client).Error; err != nil {
 		c.HTML(http.StatusBadRequest, "client/client_new.html", gin.H{
@@ -125,9 +127,11 @@ func UpdateClient(c *gin.Context) {
 
 	client.Name = input.Name
 	client.Quota = input.Quota
+	client.TotalQuota = input.TotalQuota
 	client.OwnerFio = input.OwnerFio
 	client.Inn = input.Inn
 	client.Ogrn = input.Ogrn
+
 	if err := db.DB.Save(&client).Error; err != nil {
 		c.HTML(http.StatusBadRequest, "client/client_edit.html", gin.H{
 			"Error":     "Failed to update client",

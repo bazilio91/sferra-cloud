@@ -14,6 +14,7 @@ type UserFormInput struct {
 	Username string `form:"username" binding:"required"`
 	Password string `form:"password" binding:"omitempty,min=6"`
 	ClientID uint64 `form:"client_id" binding:"required"`
+	Role     string `form:"role" binding:"required"`
 }
 
 func ListUsers(c *gin.Context) {
@@ -80,11 +81,12 @@ func CreateUser(c *gin.Context) {
 		return
 	}
 
-	user := proto.ClientUser{
+	user := proto.ClientUserORM{
 		Email:    input.Email,
 		Username: input.Username,
 		Password: string(hashedPassword),
-		ClientId: input.ClientID,
+		ClientId: &input.ClientID,
+		Role:     input.Role,
 	}
 
 	if err := db.DB.Create(&user).Error; err != nil {
@@ -152,7 +154,8 @@ func UpdateUser(c *gin.Context) {
 
 	user.Email = input.Email
 	user.Username = input.Username
-	user.ClientId = input.ClientID
+	user.ClientId = &input.ClientID
+	user.Role = input.Role
 
 	if input.Password != "" {
 		hashedPassword, err := bcrypt.GenerateFromPassword([]byte(input.Password), bcrypt.DefaultCost)

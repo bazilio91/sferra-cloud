@@ -20,16 +20,16 @@ func CreateTestClient(DB *gorm.DB, name string, quota int64) (*proto.Client, err
 	return client, nil
 }
 
-func CreateTestUser(DB *gorm.DB, email, password string, clientID uint64) (*proto.ClientUser, error) {
+func CreateTestUser(DB *gorm.DB, email, password string, clientID uint64) (*proto.ClientUserORM, error) {
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
 	if err != nil {
 		return nil, fmt.Errorf("failed to hash password: %v", err)
 	}
 
-	user := &proto.ClientUser{
+	user := &proto.ClientUserORM{
 		Email:    email,
 		Password: string(hashedPassword),
-		ClientId: clientID,
+		ClientId: &clientID,
 	}
 	if err := DB.Create(user).Error; err != nil {
 		return nil, fmt.Errorf("failed to create user: %v", err)

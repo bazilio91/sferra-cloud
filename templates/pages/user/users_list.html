@@ -31,6 +31,7 @@
             <th class="px-4 py-2">ID</th>
             <th class="px-4 py-2">Email</th>
             <th class="px-4 py-2">Client</th>
+            <th class="px-4 py-2">Role</th>
             <th class="px-4 py-2">Actions</th>
         </tr>
         </thead>
@@ -40,6 +41,7 @@
             <td class="border px-4 py-2">{{ .Id }}</td>
             <td class="border px-4 py-2">{{ .Email }}</td>
             <td class="border px-4 py-2">{{ .Client.Name }}</td>
+            <td class="border px-4 py-2">{{ .Role }}</td>
             <td class="border px-4 py-2">
                 <a href="/users/{{ .Id }}" class="text-blue-500">View</a> |
                 <a href="/users/{{ .Id }}/edit" class="text-blue-500">Edit</a> |

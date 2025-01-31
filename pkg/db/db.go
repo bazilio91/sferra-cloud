@@ -53,24 +53,24 @@ func InitDBWithDSN(dsn string) error {
 	}
 
 	// Migrate the schema
-	if err := migrateDB(); err != nil {
+	if err := migrateDB(DB); err != nil {
 		return fmt.Errorf("failed to migrate database: %w", err)
 	}
 
 	return nil
 }
 
-func migrateDB() error {
+func migrateDB(db *gorm.DB) error {
 	// Create tables in order of dependencies
 	models := []interface{}{
-		&proto.ClientUserORM{},
 		&proto.ClientORM{},
+		&proto.ClientUserORM{},
 		&proto.DataRecognitionTaskORM{},
 		&proto.Admin{},
 	}
 
 	for _, model := range models {
-		if err := DB.AutoMigrate(model); err != nil {
+		if err := db.AutoMigrate(model); err != nil {
 			return err
 		}
 	}
@@ -92,14 +92,4 @@ func NewStore(cfg *config.Config) (*Store, error) {
 	}
 
 	return store, nil
-}
-
-func (s *Store) AutoMigrate() error {
-	return s.db.AutoMigrate(
-		&proto.ClientORM{},
-		&proto.ClientUserORM{},
-		&proto.DataRecognitionTaskORM{},
-		//&proto.Admin{},
-		//&proto.Image{},
-	)
 }

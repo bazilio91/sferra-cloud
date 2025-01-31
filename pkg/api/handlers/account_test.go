@@ -15,7 +15,7 @@ import (
 var _ = Describe("Account Handlers", func() {
 	var (
 		clientModel *proto.Client
-		userModel   *proto.ClientUser
+		userModel   *proto.ClientUserORM
 	)
 
 	BeforeEach(func() {
@@ -33,7 +33,7 @@ var _ = Describe("Account Handlers", func() {
 		Context("With valid token", func() {
 			It("should return account information", func() {
 				// Generate token
-				token, err := jwtManager.GenerateToken(userModel.Id, userModel.ClientId)
+				token, err := jwtManager.GenerateToken(userModel.Id, *userModel.ClientId)
 				Expect(err).NotTo(HaveOccurred())
 
 				// Create test request

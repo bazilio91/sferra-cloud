@@ -38,15 +38,17 @@ definitions:
         type: string
       quota:
         type: integer
+      total_quota:
+        type: integer
       updated_at:
         type: integer
+      users:
+        items:
+          $ref: '#/definitions/github_com_bazilio91_sferra-cloud_pkg_proto.ClientUser'
+        type: array
     type: object
   github_com_bazilio91_sferra-cloud_pkg_proto.ClientUser:
     properties:
-      Password:
-        type: string
-      Username:
-        type: string
       client:
         $ref: '#/definitions/github_com_bazilio91_sferra-cloud_pkg_proto.Client'
       client_id:
@@ -57,8 +59,14 @@ definitions:
         type: string
       id:
         type: integer
+      password:
+        type: string
+      role:
+        type: string
       updated_at:
         type: integer
+      username:
+        type: string
     type: object
   github_com_bazilio91_sferra-cloud_pkg_proto.DataRecognitionTask:
     properties:

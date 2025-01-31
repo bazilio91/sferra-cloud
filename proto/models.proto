@@ -38,23 +38,28 @@ message Client {
   uint64 id = 1;
   string name = 2;
   int64 quota = 3;
+  int64 total_quota = 9;
   int64 created_at = 4;
   int64 updated_at = 5;
   string owner_fio = 6;
   string inn = 7;
   string ogrn = 8;
+
+  repeated ClientUser users = 10 [(gorm.field).has_many = {preload: true}];
 }
 
 message ClientUser {
   option (gorm.opts).ormable = true;
 
   uint64 id = 1;
-  uint64 client_id = 2;
   string email = 3;
   int64 created_at = 4;
   int64 updated_at = 5;
-  string Password = 6;
-  string Username = 7;
+  string password = 6;
+  string username = 7;
+  string role = 10;
+
+  optional uint64 client_id = 9;
 
   Client client = 8;
 }

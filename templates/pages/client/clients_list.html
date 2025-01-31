@@ -31,6 +31,7 @@
             <th class="px-4 py-2">ID</th>
             <th class="px-4 py-2">Name</th>
             <th class="px-4 py-2">Quota</th>
+            <th class="px-4 py-2">Total quota</th>
             <th class="px-4 py-2">Actions</th>
         </tr>
         </thead>
@@ -40,6 +41,7 @@
             <td class="border px-4 py-2">{{ .Id }}</td>
             <td class="border px-4 py-2">{{ .Name }}</td>
             <td class="border px-4 py-2">{{ .Quota }}</td>
+            <td class="border px-4 py-2">{{ .TotalQuota }}</td>
             <td class="border px-4 py-2">
                 <a href="/clients/{{ .Id }}" class="text-blue-500 underline">View</a> |
                 <a href="/clients/{{ .Id }}/edit" class="text-blue-500 underline">Edit</a> |

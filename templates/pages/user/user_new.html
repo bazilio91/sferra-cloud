@@ -16,6 +16,11 @@
             <input type="password" name="password" id="password" class="border border-gray-300 p-2 w-full" required>
         </div>
         <div class="mb-4">
+            <label for="role" class="block text-gray-700">Role</label>
+            <input type="text" name="role" id="role" class="border border-gray-300 p-2 w-full" required>
+        </div>
+
+        <div class="mb-4">
             <label for="client_id" class="block text-gray-700">Client</label>
             <select name="client_id" id="client_id" class="border border-gray-300 p-2 w-full" required>
                 {{ range .Clients }}

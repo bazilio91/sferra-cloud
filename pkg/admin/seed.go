@@ -60,6 +60,7 @@ func seedClient(s3client *storage.S3Client) error {
 		Name:         "Demacia",
 		Ogrn:         "3213213213213213213",
 		OwnerFio:     "Jarvan IV Lightshield",
+		TotalQuota:   1000,
 		Quota:        100,
 	}
 	if err := db.DB.Create(&client).Error; err != nil {

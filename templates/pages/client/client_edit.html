@@ -16,6 +16,10 @@
             <input type="number" name="quota" id="quota" class="border border-gray-300 p-2 w-full" value="{{ .Client.Quota }}" required>
         </div>
         <div class="mb-4">
+            <label for="total_quota" class="block text-gray-700">Total quota</label>
+            <input type="number" name="total_quota" id="total_quota" class="border border-gray-300 p-2 w-full" value="{{ .Client.TotalQuota }}" required>
+        </div>
+        <div class="mb-4">
             <label for="owner_fio" class="block text-gray-700">Owner Full Name</label>
             <input type="text" name="owner_fio" id="owner_fio" class="border border-gray-300 p-2 w-full" value="{{ .Client.OwnerFio }}" required>
         </div>

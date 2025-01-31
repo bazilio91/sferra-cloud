@@ -558,20 +558,23 @@ const docTemplate = `{
                 "quota": {
                     "type": "integer"
                 },
+                "total_quota": {
+                    "type": "integer"
+                },
                 "updated_at": {
                     "type": "integer"
+                },
+                "users": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/github_com_bazilio91_sferra-cloud_pkg_proto.ClientUser"
+                    }
                 }
             }
         },
         "github_com_bazilio91_sferra-cloud_pkg_proto.ClientUser": {
             "type": "object",
             "properties": {
-                "Password": {
-                    "type": "string"
-                },
-                "Username": {
-                    "type": "string"
-                },
                 "client": {
                     "$ref": "#/definitions/github_com_bazilio91_sferra-cloud_pkg_proto.Client"
                 },
@@ -587,8 +590,17 @@ const docTemplate = `{
                 "id": {
                     "type": "integer"
                 },
+                "password": {
+                    "type": "string"
+                },
+                "role": {
+                    "type": "string"
+                },
                 "updated_at": {
                     "type": "integer"
+                },
+                "username": {
+                    "type": "string"
                 }
             }
         },

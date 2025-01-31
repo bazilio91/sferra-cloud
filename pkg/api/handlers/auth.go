@@ -37,7 +37,7 @@ func Login(c *gin.Context) {
 	}
 
 	// Generate JWT token
-	token, err := jwtManager.GenerateToken(user.Id, user.ClientId)
+	token, err := jwtManager.GenerateToken(user.Id, user.GetClient().Id)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, ErrorResponse{Error: "Could not generate token"})
 		return
@@ -64,7 +64,7 @@ func Register(c *gin.Context) {
 	}
 
 	// Check if client exists
-	var client proto.Client
+	var client proto.ClientORM
 	if err := db.DB.First(&client, input.ClientID).Error; err != nil {
 		c.JSON(http.StatusBadRequest, ErrorResponse{Error: "Invalid Client ID"})
 		return
@@ -76,10 +76,10 @@ func Register(c *gin.Context) {
 		return
 	}
 
-	user := proto.ClientUser{
+	user := proto.ClientUserORM{
 		Email:    input.Email,
 		Password: string(hashedPassword),
-		ClientId: client.Id,
+		Client:   &client,
 	}
 
 	if err := db.DB.Create(&user).Error; err != nil {

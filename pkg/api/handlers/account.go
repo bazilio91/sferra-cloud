@@ -25,12 +25,13 @@ func GetAccountInfo(c *gin.Context) {
 	}
 
 	var user proto.ClientUser
-	if err := db.DB.Preload("Client").First(&user, userID).Error; err != nil {
+	if err := db.DB.Preload("Client").Preload("Client.Users").First(&user, userID).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, ErrorResponse{Error: "Could not fetch user"})
 		return
 	}
 
 	user.Password = ""
+	user.Client.Users = user.Client.GetUsers()
 
 	c.JSON(http.StatusOK, AccountInfoResponse{
 		User: user,
