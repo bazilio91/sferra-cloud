@@ -31,7 +31,10 @@ func GetAccountInfo(c *gin.Context) {
 	}
 
 	user.Password = ""
-	user.Client.Users = user.Client.GetUsers()
+
+	for i, _ := range user.Client.Users {
+		user.Client.Users[i].Password = ""
+	}
 
 	c.JSON(http.StatusOK, AccountInfoResponse{
 		User: user,
