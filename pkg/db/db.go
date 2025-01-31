@@ -63,8 +63,8 @@ func InitDBWithDSN(dsn string) error {
 func migrateDB(db *gorm.DB) error {
 	// Create tables in order of dependencies
 	models := []interface{}{
-		&proto.ClientORM{},
 		&proto.ClientUserORM{},
+		&proto.ClientORM{},
 		&proto.DataRecognitionTaskORM{},
 		&proto.Admin{},
 	}
@@ -76,20 +76,4 @@ func migrateDB(db *gorm.DB) error {
 	}
 
 	return nil
-}
-
-func NewStore(cfg *config.Config) (*Store, error) {
-	dsn := GetDSN(cfg)
-	dialector := postgres.Open(dsn)
-
-	db, err := gorm.Open(dialector, &gorm.Config{})
-	if err != nil {
-		return nil, fmt.Errorf("failed to connect to database: %w", err)
-	}
-
-	store := &Store{
-		db: db,
-	}
-
-	return store, nil
 }

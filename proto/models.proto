@@ -45,7 +45,7 @@ message Client {
   string inn = 7;
   string ogrn = 8;
 
-  repeated ClientUser users = 10 [(gorm.field).has_many = {preload: true}];
+  repeated ClientUser users = 10 [(gorm.field).has_many = {disable_association_autocreate: true disable_association_autoupdate: true preload: true}];
 }
 
 message ClientUser {
@@ -61,7 +61,7 @@ message ClientUser {
 
   optional uint64 client_id = 9;
 
-  Client client = 8;
+  Client client = 8 [(gorm.field).belongs_to = {}];
 }
 
 message Admin {
