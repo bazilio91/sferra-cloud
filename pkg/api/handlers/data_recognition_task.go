@@ -35,7 +35,7 @@ type DataRecognitionTaskListResponse struct {
 // @Failure 401 {object} ErrorResponse
 // @Router /api/v1/recognition_tasks [post]
 func CreateDataRecognitionTask(c *gin.Context) {
-	userClaims := c.MustGet("user").(*auth.Claims)
+	userClaims := c.MustGet("claims").(*auth.Claims)
 
 	var request proto.DataRecognitionTask
 	if err := c.ShouldBindJSON(&request); err != nil {
@@ -96,7 +96,7 @@ func CreateDataRecognitionTask(c *gin.Context) {
 // @Failure 404 {object} ErrorResponse
 // @Router /api/v1/recognition_tasks/{id} [get]
 func GetDataRecognitionTask(c *gin.Context) {
-	userClaims := c.MustGet("user").(*auth.Claims)
+	userClaims := c.MustGet("claims").(*auth.Claims)
 	id := c.Param("id")
 
 	// Validate UUID format
@@ -106,7 +106,7 @@ func GetDataRecognitionTask(c *gin.Context) {
 	}
 
 	var ormObj proto.DataRecognitionTaskORM
-	if err := db.DB.Preload("Client").First(&ormObj, "id = ?", id).Error; err != nil {
+	if err := db.DB.First(&ormObj, "id = ?", id).Error; err != nil {
 		c.JSON(http.StatusNotFound, ErrorResponse{Error: "task not found"})
 		return
 	}
@@ -142,7 +142,7 @@ func GetDataRecognitionTask(c *gin.Context) {
 // @Failure 404 {object} ErrorResponse
 // @Router /api/v1/recognition_tasks/{id} [put]
 func UpdateDataRecognitionTask(c *gin.Context) {
-	userClaims := c.MustGet("user").(*auth.Claims)
+	userClaims := c.MustGet("claims").(*auth.Claims)
 	id := c.Param("id")
 
 	// Validate UUID format
@@ -214,7 +214,7 @@ func UpdateDataRecognitionTask(c *gin.Context) {
 // @Failure 404 {object} ErrorResponse
 // @Router /api/v1/recognition_tasks/{id} [delete]
 func DeleteDataRecognitionTask(c *gin.Context) {
-	userClaims := c.MustGet("user").(*auth.Claims)
+	userClaims := c.MustGet("claims").(*auth.Claims)
 	id := c.Param("id")
 
 	// Validate UUID format
