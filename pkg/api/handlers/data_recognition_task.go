@@ -293,6 +293,7 @@ func ListDataRecognitionTask(c *gin.Context) {
 			c.JSON(http.StatusInternalServerError, ErrorResponse{Error: err.Error()})
 			return
 		}
+
 		results = append(results, proto)
 	}
 
