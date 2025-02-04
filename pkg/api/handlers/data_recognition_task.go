@@ -280,7 +280,7 @@ func ListDataRecognitionTask(c *gin.Context) {
 
 	var ormResults []proto.DataRecognitionTaskORM
 	offset := (page - 1) * pageSize
-	if err := query.Preload("Client").Offset(offset).Limit(pageSize).Find(&ormResults).Error; err != nil {
+	if err := query.Offset(offset).Limit(pageSize).Find(&ormResults).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, ErrorResponse{Error: err.Error()})
 		return
 	}
