@@ -112,7 +112,7 @@ func GetDataRecognitionTask(c *gin.Context) {
 	}
 
 	// Check client access
-	if ormObj.Client == nil || ormObj.Client.Id != uint64(userClaims.ClientID) {
+	if *ormObj.ClientId != userClaims.ClientID {
 		c.JSON(http.StatusForbidden, ErrorResponse{Error: "access denied"})
 		return
 	}
@@ -153,7 +153,7 @@ func UpdateDataRecognitionTask(c *gin.Context) {
 
 	// GetTaskImage existing task
 	var existingORM proto.DataRecognitionTaskORM
-	if err := db.DB.First(&existingORM, "id = ?", id).Error; err != nil {
+	if err := db.DB.Preload("Client").First(&existingORM, "id = ?", id).Error; err != nil {
 		c.JSON(http.StatusNotFound, ErrorResponse{Error: "task not found"})
 		return
 	}
