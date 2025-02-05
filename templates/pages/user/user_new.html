@@ -24,7 +24,7 @@
             <label for="client_id" class="block text-gray-700">Client</label>
             <select name="client_id" id="client_id" class="border border-gray-300 p-2 w-full" required>
                 {{ range .Clients }}
-                <option value="{{ .ID }}">{{ .Name }}</option>
+                <option value="{{ .Id }}">{{ .Name }}</option>
                 {{ end }}
             </select>
         </div>
