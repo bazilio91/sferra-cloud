@@ -7,6 +7,7 @@ import (
 	csrf "github.com/utrack/gin-csrf"
 	"gorm.io/gorm"
 	"net/http"
+	"strconv"
 )
 
 func ListRecognitionTasks(c *gin.Context) {
@@ -100,7 +101,12 @@ func UpdateRecognitionTask(c *gin.Context) {
 
 	status := c.PostForm("status")
 	if status != "" {
-		task.Status = proto.Status_value[status]
+		statusInt, err := strconv.ParseInt(status, 10, 32)
+		if err != nil {
+			c.String(http.StatusBadRequest, "Invalid status")
+			return
+		}
+		task.Status = int32(statusInt)
 	}
 
 	if err := db.DB.Save(&task).Error; err != nil {

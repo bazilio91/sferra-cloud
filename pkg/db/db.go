@@ -2,6 +2,7 @@ package db
 
 import (
 	"fmt"
+	"github.com/bazilio91/sferra-cloud/pkg/db_hooks"
 	"log"
 	"os"
 
@@ -34,6 +35,8 @@ func InitDB(cfg *config.Config) error {
 	return InitDBWithDSN(dsn)
 }
 
+var StateMachine *db_hooks.StateMachine
+
 func InitDBWithDSN(dsn string) error {
 	var err error
 	DB, err = gorm.Open(postgres.Open(dsn), &gorm.Config{})
@@ -56,6 +59,8 @@ func InitDBWithDSN(dsn string) error {
 	if err := migrateDB(DB); err != nil {
 		return fmt.Errorf("failed to migrate database: %w", err)
 	}
+
+	StateMachine = db_hooks.NewStateMachine(DB)
 
 	return nil
 }

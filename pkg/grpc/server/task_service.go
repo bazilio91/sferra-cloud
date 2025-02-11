@@ -18,10 +18,10 @@ type TaskService struct {
 	stateMachine *db_hooks.StateMachine
 }
 
-func NewTaskService(db *gorm.DB) *TaskService {
+func NewTaskService(db *gorm.DB, machine *db_hooks.StateMachine) *TaskService {
 	return &TaskService{
 		db:           db,
-		stateMachine: db_hooks.NewStateMachine(db),
+		stateMachine: machine,
 	}
 }
 

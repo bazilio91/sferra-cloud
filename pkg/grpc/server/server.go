@@ -66,6 +66,9 @@ func RunGRPCServer() error {
 		grpc.StreamInterceptor(authInterceptor.Stream()),
 	)
 
+	// Register the service with the server
+	//proto.RegisterTaskServiceServer(grpcServer, ts)
+
 	log.Printf("Starting gRPC server on port %s...", port)
 	if err := grpcServer.Serve(lis); err != nil {
 		return fmt.Errorf("failed to serve: %v", err)
