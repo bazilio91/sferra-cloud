@@ -4,6 +4,7 @@ import (
 	"github.com/bazilio91/sferra-cloud/pkg/db"
 	"github.com/bazilio91/sferra-cloud/pkg/proto"
 	"github.com/gin-gonic/gin"
+	csrf "github.com/utrack/gin-csrf"
 	"gorm.io/gorm"
 	"net/http"
 )
@@ -61,7 +62,8 @@ func EditRecognitionTask(c *gin.Context) {
 	}
 
 	c.HTML(http.StatusOK, "recognition_task/edit.html", gin.H{
-		"Task": task,
+		"Task":      task,
+		"CsrfToken": csrf.GetToken(c),
 		"Statuses": []gin.H{
 			{"Value": int32(proto.Status_STATUS_CREATED), "Label": "Created"},
 			{"Value": int32(proto.Status_STATUS_READY_FOR_PROCESSING), "Label": "Ready for Processing"},
