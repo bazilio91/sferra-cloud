@@ -77,6 +77,7 @@ func EditRecognitionTask(c *gin.Context) {
 			{"Value": int32(proto.Status_STATUS_RECOGNITION_FAILED_QUOTA), "Label": "Recognition Failed (Quota)"},
 			{"Value": int32(proto.Status_STATUS_RECOGNITION_FAILED_PROCESSING), "Label": "Recognition Failed (Processing)"},
 			{"Value": int32(proto.Status_STATUS_RECOGNITION_FAILED_TIMEOUT), "Label": "Recognition Failed (Timeout)"},
+			{"Value": int32(proto.Status_STATUS_PROCESSING_COMPLETED), "Label": "Processing completed"},
 		},
 	})
 }
