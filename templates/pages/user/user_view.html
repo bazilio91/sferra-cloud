@@ -1,17 +1,17 @@
 {{ define "content" }}
 <div class="container mx-auto mt-10">
-    <h1 class="text-2xl font-bold mb-4">User Details</h1>
+    <h1 class="text-2xl font-bold mb-4">Информация о пользователе</h1>
     <div class="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4">
         <p class="mb-2"><strong>ID:</strong> {{ .User.Id }}</p>
         <p class="mb-2"><strong>Email:</strong> {{ .User.Email }}</p>
-        <p class="mb-2"><strong>Username:</strong> {{ .User.Username }}</p>
-        <p class="mb-2"><strong>Client:</strong> {{ .User.Client.Name }}</p>
-        <p class="mb-2"><strong>Role:</strong> {{ .User.Role }}</p>
-        <p class="mb-2"><strong>Created At:</strong> {{ .User.CreatedAt }}</p>
-        <p class="mb-2"><strong>Updated At:</strong> {{ .User.UpdatedAt }}</p>
+        <p class="mb-2"><strong>Имя пользователя:</strong> {{ .User.Username }}</p>
+        <p class="mb-2"><strong>Клиент:</strong> {{ .User.Client.Name }}</p>
+        <p class="mb-2"><strong>Роль:</strong> {{ .User.Role }}</p>
+        <p class="mb-2"><strong>Создан:</strong> {{ .User.CreatedAt }}</p>
+        <p class="mb-2"><strong>Обновлен:</strong> {{ .User.UpdatedAt }}</p>
         <div class="mt-4">
-            <a href="/users/{{ .User.Id }}/edit" class="text-blue-500 hover:text-blue-700 mr-4">Edit</a>
-            <a href="/users" class="text-blue-500 hover:text-blue-700">Back to Users</a>
+            <a href="/users/{{ .User.Id }}/edit" class="text-blue-500 hover:text-blue-700 mr-4">Редактировать</a>
+            <a href="/users" class="text-blue-500 hover:text-blue-700">Вернуться к списку пользователей</a>
         </div>
     </div>
 </div>

@@ -49,7 +49,7 @@ func ListClients(c *gin.Context) {
 }
 
 func NewClient(c *gin.Context) {
-	c.HTML(http.StatusOK, "client_new.html", gin.H{
+	c.HTML(http.StatusOK, "client/client_new.html", gin.H{
 		"CsrfToken": csrf.GetToken(c),
 	})
 }

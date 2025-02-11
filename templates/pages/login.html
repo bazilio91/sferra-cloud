@@ -1,6 +1,6 @@
 {{ define "content" }}
 <div class="container mx-auto mt-10 max-w-md">
-    <h1 class="text-2xl font-bold mb-4">Admin Login</h1>
+    <h1 class="text-2xl font-bold mb-4">Вход в систему</h1>
     {{ if .Error }}
     <div class="bg-red-200 text-red-800 p-2 mb-4">
         {{ .Error }}
@@ -8,14 +8,14 @@
     {{ end }}
     <form method="POST" action="/login">
         <div class="mb-4">
-            <label for="username" class="block text-gray-700">Username</label>
+            <label for="username" class="block text-gray-700">Имя пользователя</label>
             <input type="text" name="username" id="username" class="border border-gray-300 p-2 w-full" required>
         </div>
         <div class="mb-4">
-            <label for="password" class="block text-gray-700">Password</label>
+            <label for="password" class="block text-gray-700">Пароль</label>
             <input type="password" name="password" id="password" class="border border-gray-300 p-2 w-full" required>
         </div>
-        <button type="submit" class="bg-blue-500 text-white px-4 py-2">Login</button>
+        <button type="submit" class="bg-blue-500 text-white px-4 py-2">Войти</button>
 
         {{ template "csrf" . }}
     </form>

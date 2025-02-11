@@ -1,7 +1,7 @@
 {{ define "content" }}
 <div class="container mx-auto mt-10">
-    <h1 class="text-2xl font-bold mb-4">Clients</h1>
-    <a href="/clients/new" class="bg-blue-500 text-white px-4 py-2">Add New Client</a>
+    <h1 class="text-2xl font-bold mb-4">Клиенты</h1>
+    <a href="/clients/new" class="bg-blue-500 text-white px-4 py-2">Добавить клиента</a>
 
     <!-- Filter Form -->
     <form method="GET" action="/clients" class="mt-4">
@@ -11,11 +11,11 @@
                 <input type="text" name="id" id="id" value="{{ .IdFilter }}" class="border border-gray-300 p-2">
             </div>
             <div>
-                <label for="name" class="block text-gray-700">Name</label>
+                <label for="name" class="block text-gray-700">Название</label>
                 <input type="text" name="name" id="name" value="{{ .NameFilter }}" class="border border-gray-300 p-2">
             </div>
             <div class="flex items-end">
-                <button type="submit" class="bg-blue-500 text-white px-4 py-2">Filter</button>
+                <button type="submit" class="bg-blue-500 text-white px-4 py-2">Фильтровать</button>
             </div>
         </div>
     </form>
@@ -29,10 +29,10 @@
         <thead>
         <tr>
             <th class="px-4 py-2">ID</th>
-            <th class="px-4 py-2">Name</th>
-            <th class="px-4 py-2">Quota</th>
-            <th class="px-4 py-2">Total quota</th>
-            <th class="px-4 py-2">Actions</th>
+            <th class="px-4 py-2">Название</th>
+            <th class="px-4 py-2">Квота</th>
+            <th class="px-4 py-2">Общая квота</th>
+            <th class="px-4 py-2">Действия</th>
         </tr>
         </thead>
         <tbody>
@@ -43,16 +43,16 @@
             <td class="border px-4 py-2">{{ .Quota }}</td>
             <td class="border px-4 py-2">{{ .TotalQuota }}</td>
             <td class="border px-4 py-2">
-                <a href="/clients/{{ .Id }}" class="text-blue-500 underline">View</a> |
-                <a href="/clients/{{ .Id }}/edit" class="text-blue-500 underline">Edit</a> |
+                <a href="/clients/{{ .Id }}" class="text-blue-500 underline">Просмотр</a> |
+                <a href="/clients/{{ .Id }}/edit" class="text-blue-500 underline">Редактировать</a> |
                 <form action="/clients/{{ .Id }}/delete" method="POST" style="display:inline;">
-                    <button type="submit" class="text-red-500 underline">Delete</button>
+                    <button type="submit" class="text-red-500 underline">Удалить</button>
                 </form>
             </td>
         </tr>
         {{ else }}
         <tr>
-            <td colspan="4" class="text-center p-4">No clients found.</td>
+            <td colspan="4" class="text-center p-4">Клиенты не найдены.</td>
         </tr>
         {{ end }}
         </tbody>

@@ -1,7 +1,7 @@
 {{ define "content" }}
 <div class="container mx-auto mt-10">
-    <h1 class="text-2xl font-bold mb-4">Users</h1>
-    <a href="/users/new" class="bg-blue-500 text-white px-4 py-2">Add New User</a>
+    <h1 class="text-2xl font-bold mb-4">Пользователи</h1>
+    <a href="/users/new" class="bg-blue-500 text-white px-4 py-2">Добавить пользователя</a>
 
     <!-- Filter Form -->
     <form method="GET" action="/users" class="mt-4">
@@ -11,11 +11,11 @@
                 <input type="text" name="email" id="email" value="{{ .EmailFilter }}" class="border border-gray-300 p-2">
             </div>
             <div>
-                <label for="client_name" class="block text-gray-700">Client Name</label>
+                <label for="client_name" class="block text-gray-700">Название клиента</label>
                 <input type="text" name="client_name" id="client_name" value="{{ .ClientNameFilter }}" class="border border-gray-300 p-2">
             </div>
             <div class="flex items-end">
-                <button type="submit" class="bg-blue-500 text-white px-4 py-2">Filter</button>
+                <button type="submit" class="bg-blue-500 text-white px-4 py-2">Фильтровать</button>
             </div>
         </div>
     </form>
@@ -30,9 +30,9 @@
         <tr>
             <th class="px-4 py-2">ID</th>
             <th class="px-4 py-2">Email</th>
-            <th class="px-4 py-2">Client</th>
-            <th class="px-4 py-2">Role</th>
-            <th class="px-4 py-2">Actions</th>
+            <th class="px-4 py-2">Клиент</th>
+            <th class="px-4 py-2">Роль</th>
+            <th class="px-4 py-2">Действия</th>
         </tr>
         </thead>
         <tbody>
@@ -43,16 +43,16 @@
             <td class="border px-4 py-2">{{ .Client.Name }}</td>
             <td class="border px-4 py-2">{{ .Role }}</td>
             <td class="border px-4 py-2">
-                <a href="/users/{{ .Id }}" class="text-blue-500">View</a> |
-                <a href="/users/{{ .Id }}/edit" class="text-blue-500">Edit</a> |
+                <a href="/users/{{ .Id }}" class="text-blue-500">Просмотр</a> |
+                <a href="/users/{{ .Id }}/edit" class="text-blue-500">Редактировать</a> |
                 <form action="/users/{{ .Id }}/delete" method="POST" style="display:inline;">
-                    <button type="submit" class="text-red-500">Delete</button>
+                    <button type="submit" class="text-red-500">Удалить</button>
                 </form>
             </td>
         </tr>
         {{ else }}
         <tr>
-            <td colspan="4" class="text-center p-4">No users found.</td>
+            <td colspan="4" class="text-center p-4">Пользователи не найдены.</td>
         </tr>
         {{ end }}
         </tbody>

@@ -1,6 +1,6 @@
 {{ define "content" }}
 <div class="container mx-auto mt-10 max-w-md">
-    <h1 class="text-2xl font-bold mb-4">Edit Client</h1>
+    <h1 class="text-2xl font-bold mb-4">Редактирование клиента</h1>
     {{ if .Error }}
     <div class="bg-red-200 text-red-800 p-2 mb-4">
         {{ .Error }}
@@ -8,31 +8,31 @@
     {{ end }}
     <form method="POST" action="/clients/{{ .Client.Id }}">
         <div class="mb-4">
-            <label for="name" class="block text-gray-700">Name</label>
+            <label for="name" class="block text-gray-700">Название</label>
             <input type="text" name="name" id="name" class="border border-gray-300 p-2 w-full" value="{{ .Client.Name }}" required>
         </div>
         <div class="mb-4">
-            <label for="quota" class="block text-gray-700">Quota</label>
+            <label for="quota" class="block text-gray-700">Квота</label>
             <input type="number" name="quota" id="quota" class="border border-gray-300 p-2 w-full" value="{{ .Client.Quota }}" required>
         </div>
         <div class="mb-4">
-            <label for="total_quota" class="block text-gray-700">Total quota</label>
+            <label for="total_quota" class="block text-gray-700">Общая квота</label>
             <input type="number" name="total_quota" id="total_quota" class="border border-gray-300 p-2 w-full" value="{{ .Client.TotalQuota }}" required>
         </div>
         <div class="mb-4">
-            <label for="owner_fio" class="block text-gray-700">Owner Full Name</label>
+            <label for="owner_fio" class="block text-gray-700">ФИО владельца</label>
             <input type="text" name="owner_fio" id="owner_fio" class="border border-gray-300 p-2 w-full" value="{{ .Client.OwnerFio }}" required>
         </div>
         <div class="mb-4">
-            <label for="inn" class="block text-gray-700">INN</label>
+            <label for="inn" class="block text-gray-700">ИНН</label>
             <input type="text" name="inn" id="inn" class="border border-gray-300 p-2 w-full" value="{{ .Client.Inn }}" required>
         </div>
         <div class="mb-4">
-            <label for="ogrn" class="block text-gray-700">OGRN</label>
+            <label for="ogrn" class="block text-gray-700">ОГРН</label>
             <input type="text" name="ogrn" id="ogrn" class="border border-gray-300 p-2 w-full" value="{{ .Client.Ogrn }}" required>
         </div>
         {{ template "csrf" . }}
-        <button type="submit" class="bg-blue-500 text-white px-4 py-2">Update</button>
+        <button type="submit" class="bg-blue-500 text-white px-4 py-2">Сохранить</button>
     </form>
 </div>
 {{ end }}

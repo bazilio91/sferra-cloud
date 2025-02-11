@@ -87,6 +87,7 @@ func setupRoutes(router *gin.Engine) {
 		authorized.POST("/users", CreateUser)
 		authorized.GET("/users/:id/edit", EditUser)
 		authorized.POST("/users/:id", UpdateUser)
+		authorized.GET("/users/:id", ViewUser)
 		authorized.POST("/users/:id/delete", DeleteUser)
 
 		// Recognition Task routes
