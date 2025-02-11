@@ -92,4 +92,6 @@ message TreeNode {
   Figure figure = 7;
   int32 accumulated_count = 8;
   repeated TreeNode leaves = 9;
+
+  string parent_id = 10;
 }

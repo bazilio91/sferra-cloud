@@ -619,6 +619,9 @@ const docTemplate = `{
                 "frontend_result": {
                     "$ref": "#/definitions/github_com_bazilio91_sferra-cloud_pkg_proto.TreeNode"
                 },
+                "frontend_result_flat": {
+                    "$ref": "#/definitions/types.JSONValue"
+                },
                 "frontend_result_unrecognized": {
                     "$ref": "#/definitions/types.JSONValue"
                 },
@@ -768,7 +771,8 @@ const docTemplate = `{
                 10,
                 11,
                 12,
-                13
+                13,
+                15
             ],
             "x-enum-varnames": [
                 "Status_STATUS_CREATED",
@@ -784,7 +788,8 @@ const docTemplate = `{
                 "Status_STATUS_RECOGNITION_COMPLETED",
                 "Status_STATUS_RECOGNITION_FAILED_QUOTA",
                 "Status_STATUS_RECOGNITION_FAILED_PROCESSING",
-                "Status_STATUS_RECOGNITION_FAILED_TIMEOUT"
+                "Status_STATUS_RECOGNITION_FAILED_TIMEOUT",
+                "Status_STATUS_PROCESSING_COMPLETED"
             ]
         },
         "github_com_bazilio91_sferra-cloud_pkg_proto.TreeNode": {
@@ -815,6 +820,9 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "number": {
+                    "type": "string"
+                },
+                "parent_id": {
                     "type": "string"
                 },
                 "spec": {

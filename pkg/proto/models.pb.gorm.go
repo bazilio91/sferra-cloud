@@ -317,6 +317,7 @@ type DataRecognitionTaskORM struct {
 	CreatedAt                  *time.Time
 	Error                      string
 	FrontendResult             *datatypes.JSONType[TreeNode]
+	FrontendResultFlat         *types.Jsonb   `gorm:"type:jsonb"`
 	FrontendResultUnrecognized *types.Jsonb   `gorm:"type:jsonb"`
 	Id                         string         `gorm:"type:uuid;primaryKey;default:uuid_generate_v4()"`
 	ProcessedImages            pq.StringArray `gorm:"type:text[]"`
@@ -366,6 +367,9 @@ func (m *DataRecognitionTask) ToORM(ctx context.Context) (DataRecognitionTaskORM
 	if m.FrontendResultUnrecognized != nil {
 		to.FrontendResultUnrecognized = &types.Jsonb{[]byte(m.FrontendResultUnrecognized.Value)}
 	}
+	if m.FrontendResultFlat != nil {
+		to.FrontendResultFlat = &types.Jsonb{[]byte(m.FrontendResultFlat.Value)}
+	}
 	if m.CreatedAt != nil {
 		t := m.CreatedAt.AsTime()
 		to.CreatedAt = &t
@@ -412,6 +416,9 @@ func (m *DataRecognitionTaskORM) ToPB(ctx context.Context) (DataRecognitionTask,
 	}
 	if m.FrontendResultUnrecognized != nil {
 		to.FrontendResultUnrecognized = &types.JSONValue{Value: string(m.FrontendResultUnrecognized.RawMessage)}
+	}
+	if m.FrontendResultFlat != nil {
+		to.FrontendResultFlat = &types.JSONValue{Value: string(m.FrontendResultFlat.RawMessage)}
 	}
 	if m.CreatedAt != nil {
 		to.CreatedAt = timestamppb.New(*m.CreatedAt)
@@ -1854,6 +1861,7 @@ func DefaultApplyFieldMaskDataRecognitionTask(ctx context.Context, patchee *Data
 	var updatedRecognitionResult bool
 	var updatedFrontendResult bool
 	var updatedFrontendResultUnrecognized bool
+	var updatedFrontendResultFlat bool
 	var updatedCreatedAt bool
 	var updatedUpdatedAt bool
 	for i, f := range updateMask.Paths {
@@ -1955,6 +1963,11 @@ func DefaultApplyFieldMaskDataRecognitionTask(ctx context.Context, patchee *Data
 		if !updatedFrontendResultUnrecognized && strings.HasPrefix(f, prefix+"FrontendResultUnrecognized") {
 			patchee.FrontendResultUnrecognized = patcher.FrontendResultUnrecognized
 			updatedFrontendResultUnrecognized = true
+			continue
+		}
+		if !updatedFrontendResultFlat && strings.HasPrefix(f, prefix+"FrontendResultFlat") {
+			patchee.FrontendResultFlat = patcher.FrontendResultFlat
+			updatedFrontendResultFlat = true
 			continue
 		}
 		if !updatedCreatedAt && strings.HasPrefix(f, prefix+"CreatedAt.") {

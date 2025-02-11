@@ -2,8 +2,10 @@ package db_hooks
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
+	types2 "github.com/infobloxopen/protoc-gen-gorm/types"
 	"sync"
 	"time"
 
@@ -126,6 +128,8 @@ func (sm *StateMachine) Process(ctx context.Context, task *proto.DataRecognition
 		return sm.handleRecognitionProcessing(ctx, task)
 	case proto.Status_STATUS_RECOGNITION_FAILED_QUOTA:
 		return sm.handleRecognitionFailedQuota(ctx, task)
+	case proto.Status_STATUS_RECOGNITION_COMPLETED:
+		return sm.handleRecognitionCompleted(ctx, task)
 	case proto.Status_STATUS_IMAGES_FAILED_QUOTA:
 		return sm.handleImagesFailedQuota(ctx, task)
 	default:
@@ -249,6 +253,33 @@ func (sm *StateMachine) handleRecognitionFailedQuota(ctx context.Context, task *
 func (sm *StateMachine) handleImagesFailedQuota(ctx context.Context, task *proto.DataRecognitionTaskORM) error {
 	// Handle images failed quota state
 	return nil
+}
+
+func nodeFlatten(node proto.TreeNode, nodes []interface{}) []interface{} {
+	for _, child := range node.Leaves {
+		child.ParentId = node.Id
+		nodes = nodeFlatten(*child, nodes)
+	}
+
+	return append(nodes, node)
+}
+
+func (sm *StateMachine) handleRecognitionCompleted(ctx context.Context, task *proto.DataRecognitionTaskORM) error {
+	// flatten the recognition result
+	node := task.RecognitionResult.Data()
+	nodes := nodeFlatten(node, []interface{}{})
+
+	bytes, err := json.Marshal(nodes)
+	if err != nil {
+		return err
+	}
+	// save the flattened result
+	task.FrontendResultFlat = &types2.Jsonb{bytes}
+	task.FrontendResult = nil
+	task.FrontendResultUnrecognized = nil
+	task.Status = int32(proto.Status_STATUS_PROCESSING_COMPLETED)
+
+	return sm.db.Save(task).Error
 }
 
 // IsTerminalStateOld returns true if the status is a terminal state

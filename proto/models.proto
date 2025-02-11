@@ -30,6 +30,9 @@ enum Status {
   STATUS_RECOGNITION_FAILED_QUOTA = 11;
   STATUS_RECOGNITION_FAILED_PROCESSING = 12;
   STATUS_RECOGNITION_FAILED_TIMEOUT = 13;
+
+  // final states
+  STATUS_PROCESSING_COMPLETED = 15;
 }
 
 message Client {
@@ -96,6 +99,7 @@ message DataRecognitionTask {
   optional TreeNode recognition_result = 12;
   optional TreeNode frontend_result = 13;
   optional gorm.types.JSONValue frontend_result_unrecognized = 14;
+  optional gorm.types.JSONValue frontend_result_flat = 15;
 
   google.protobuf.Timestamp created_at = 20;
   google.protobuf.Timestamp updated_at = 21;
